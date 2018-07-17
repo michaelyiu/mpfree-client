@@ -113,7 +113,7 @@ class App extends Component {
     const url = new URL(url_string);
     const ACCESS_TOKEN = url.searchParams.get("access_token");
   
-    if(!accessToken)
+    if (!ACCESS_TOKEN)
       return;
 
     const endpoint = 'https://api.spotify.com/v1/me';
