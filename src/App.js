@@ -62,7 +62,6 @@ class HoursCounter extends Component {
     let totalDuration = Math.round(allSongs.reduce((sum, eachSong) => {
       return sum + eachSong.duration
     }, 0) / 60)
-    console.log(allSongs);
     
     return (
       <div style={{ color: 'grey', width: "40%", display: 'inline-block', margin: '0 auto', 'textAlign': 'center' }}>
@@ -93,7 +92,7 @@ class Playlist extends Component {
         <h3>{playlist.name}</h3>
         <ul>
           {playlist.songs.map(song =>
-            <li>{song.name}</li>
+            <li key={song.name}>{song.name}</li>
           )}
         </ul>
       </div>
@@ -107,6 +106,57 @@ class App extends Component {
     this.state = {
       serverData: {},
       filterString: '',
+      device_id: '',
+      playing: false
+    }
+    this.playerCheckInterval = null;
+  }
+   createEventHandlers() {
+    this.player.on('initialization_error', e => { console.error(e); });
+    this.player.on('authentication_error', e => {
+      console.error(e);
+      // this.setState({ loggedIn: false });
+    });
+    this.player.on('account_error', e => { console.error(e); });
+    this.player.on('playback_error', e => { console.error(e); });
+
+    // Playback status updates
+    this.player.on('player_state_changed', state => this.onStateChanged(state));
+
+    // Ready
+    this.player.on('ready', async data => {
+      let { device_id } = data;
+      console.log("Let the music play on!");
+      await this.setState({ deviceId: device_id });
+      this.transferPlaybackHere();
+    });
+  }
+
+  checkForPlayer(){
+    const { token } = this.state;
+    // console.log(window.Spotify);
+    
+    if(window.Spotify != null){
+      clearInterval(this.playerCheckInterval);
+      this.player = new window.Spotify.Player({
+        name: "Michael Yiu's Spotify Player",
+        getOAuthToken: cb => { cb(token); }
+      });
+      this.createEventHandlers();
+
+      //finally connect!
+      this.player.connect();
+// console.log(this.player);
+
+    }
+  }
+
+
+  detectDesktop(){
+    if(window.innerWidth <= 1000 && window.innerHeight <= 700){
+      return true;
+    } else {
+      return false;
     }
   }
 
@@ -154,8 +204,6 @@ class App extends Component {
               name: trackData.name,
               duration: trackData.duration_ms / 1000
             }))
-          console.log(playlists);
-
           })
         return playlists;
       })
@@ -165,8 +213,6 @@ class App extends Component {
     })
       .then(playlists => this.setState({ 
         playlists: playlists.map(item => {
-          console.log(item.trackDatas);
-          
           return {
             name: item.name,
             imageUrl: item.images[0].url,
@@ -174,9 +220,114 @@ class App extends Component {
           }
         })
       }))
+
+
+      
+      
+      
+      
+      // const endpoint = 'https://api.spotify.com/v1/me';
+      fetch(endpoint + '/player/devices', {
+        headers: { 'Authorization': 'Bearer ' + ACCESS_TOKEN }
+      }).then(response => response.json())
+      .then(data => {
+        const deviceId = data.devices.find((device) => device.type === "Smartphone") 
+          ? data.devices.find((device) => device.type === "Smartphone").id : data.devices[0].id;
+        const deviceType = data.devices.find((device) => device.type === "Smartphone")
+          ? data.devices.find((device) => device.type === "Smartphone").type : data.devices[0].type;
+        console.log(data);
+        
+        // const deviceId = data.devices ? data.devices.find((device) => device.type === "Smartphone") : data.devices[0].id;
+        let playerEndpoint = endpoint + `/player/play?device_id=${deviceId}`
+        // console.log(deviceId);
+        
+        fetch(endpoint + `/player/play?device_id=${deviceId}`, {
+          method: 'PUT',
+          headers: { 'Authorization': 'Bearer ' + ACCESS_TOKEN }
+        })
+        .then(response => console.log(response))
+          .then(data => {
+            // console.log(data);
+          })
+
+          this.setState({
+            deviceType: deviceType
+          })
+
+      }
+    );
+
+    // fetch(endpoint + '/player', {
+    //   headers: { 'Authorization': 'Bearer ' + ACCESS_TOKEN }
+    // // }).then(response => response.json())
+    // }).then(response => console.log(response))
+    // .then(data => {
+    //     // console.log(data);
+    //   });
+
+
+
+      this.setState({
+        token: ACCESS_TOKEN
+      }, )
+
+      this.playerCheckInterval = setInterval(() => this.checkForPlayer(), 1000);
+  }
+
+
+  transferPlaybackHere(){
+    const { deviceId, token } = this.state;
+    fetch("https://api.spotify.com/v1/me/player", {
+      method: "PUT",
+      headers: {
+        authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        "device_ids": [deviceId],
+        "play": true,
+      }),
+    });
+  }
+
+  onStateChanged(state) {
+    // if we're no longer listening to music, we'll get a null state.
+    if (state !== null) {
+      // const {
+      //   current_track: currentTrack,
+      //   position,
+      //   duration,
+      // } = state.track_window;
+      // const trackName = currentTrack.name;
+      // const albumName = currentTrack.album.name;
+      // const artistName = currentTrack.artists
+      //   .map(artist => artist.name)
+      //   .join(", ");
+      const playing = !state.paused;
+      this.setState({
+        // position,
+        // duration,
+        // trackName,
+        // albumName,
+        // artistName,
+        playing
+      });
+    }
+  }
+
+
+  onPrevClick(){
+    this.player.previousTrack();
+  }
+  onPlayClick() {
+    this.player.togglePlay();
+  }
+  onNextClick() {
+    this.player.nextTrack();
   }
 
   render() {
+    
     let playlistToRender = 
       this.state.user && 
       this.state.playlists
@@ -199,7 +350,9 @@ class App extends Component {
             <Filter onTextChange={text =>
               this.setState({ filterString: text })} />
             {playlistToRender.map(playlist =>
-              <Playlist playlist={playlist} />
+             <Playlist 
+                key={playlist.imageUrl}
+                playlist={playlist} />
             )}
           </div> : <button onClick={() => {
             window.location = window.location.href.includes('localhost') 
@@ -208,6 +361,14 @@ class App extends Component {
           }
           style={{ padding: '20px', fontSize: '50px', marginTop: '20px' }}>Sign in with Spotify</button>
         }
+        {this.state.deviceType === "Computer" 
+          ? <div className="player-controls">
+              <button onClick={() => this.onPrevClick()}>Previous</button>  
+              <button onClick={() => this.onPlayClick()}>{this.state.playing ? "Pause" : "Play"}</button> 
+              <button onClick={() => this.onNextClick()}>Next</button>  
+            </div>
+          : null }
+
       </div>
     );
   }
