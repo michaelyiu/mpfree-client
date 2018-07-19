@@ -1,53 +1,30 @@
 import React, { Component } from 'react';
+import Navigation from './components/Navigation';
+import MainContent from './components/MainContent';
+import Player from './components/Player';
+import 'reset-css/reset.css';
 import './App.css';
 
 let defaultTextColor = 'grey';
 let defaultStyle={
-  color: defaultTextColor
+  color: defaultTextColor,
+  'font-family': 'Helvetica'
 }
-let fakeServerData = {
-  user: {
-    name: 'Monon',
-    playlists: [
-      {
-        name: 'My Favourites',
-        songs: [{ name: 'Finesse', duration: 1345 },
-        { name: 'Attention', duration: 1231 },
-        { name: 'We Dont talk Anymore', duration: 1414 },
-        { name: 'Does It Feel', duration: 1544 },
-        { name: 'Never Be The Same', duration: 1666 },
-        { name: 'Thats What I Like', duration: 1141 }]
-      },
-      {
-        name: 'Hmmm',
-        songs: [{ name: 'Im Upset', duration: 2144 },
-        { name: 'Gods Plan', duration: 1658 },
-        { name: 'Perfect', duration: 1539 },
-        { name: 'Girls Like You', duration: 1722 },
-        { name: 'Without You', duration: 1485 },
-        { name: 'Teacher', duration: 1598 }]
-      },
-      {
-        name: 'Shocking',
-        songs: [{ name: 'This Is America', duration: 1787 },
-        { name: 'Done For Me', duration: 1555 },
-        { name: 'Sit Still, Look Pretty', duration: 2155 },
-        { name: 'Cake', duration: 2355 }]
-      },
-      {
-        name: 'The Past',
-        songs: [{ name: 'Despacito', duration: 1915 },
-        { name: 'Bodak Yellow', duration: 1250 },
-        { name: 'Wild Thoughts', duration: 1400 },
-        { name: 'No Limit', duration: 1578 }]
-      }]
-  }
+let counterStyle = {
+  ...defaultStyle,
+  width: "40%",
+  display: 'inline-block',
+  margin: '0 auto',
+  'margin-bottom': '20px',
+  'fontSize': '20px',
+  'line-height': '30px',
+  'textAlign': 'center'
 }
 
 class PlaylistCounter extends Component {
   render() {
     return (
-      <div className="aggregate" style={{ color: 'grey', width: "40%", display: 'inline-block', margin: '0 auto', 'textAlign': 'center' }}>
+      <div style={counterStyle}>
         <h2>{this.props.playlists.length} playlists</h2>
       </div>
     );
@@ -55,6 +32,7 @@ class PlaylistCounter extends Component {
 }
 
 class HoursCounter extends Component {
+  
   render() {
     let allSongs = this.props.playlists.reduce((songs, eachPlaylist) => {
       return songs.concat(eachPlaylist.songs);
@@ -64,7 +42,7 @@ class HoursCounter extends Component {
     }, 0) / 60)
     
     return (
-      <div style={{ color: 'grey', width: "40%", display: 'inline-block', margin: '0 auto', 'textAlign': 'center' }}>
+      <div style={counterStyle}>
         <h2>{totalDuration} hours</h2>
       </div>
     );
@@ -77,28 +55,40 @@ class Filter extends Component {
       <div style={{ color: defaultTextColor }}>
         <img src="" alt="" />
         <input type="text" onKeyUp={event =>
-          this.props.onTextChange(event.target.value)} />
+          this.props.onTextChange(event.target.value)} 
+          style={{...defaultStyle, 
+            color: 'black', 
+            'font-size': '20px', 
+            padding: '10px',
+            margin: '20px'
+          }}
+            />
       </div>
     )
   }
 }
 
-class Playlist extends Component {
-  render() {
-    let playlist = this.props.playlist;
-    return (
-      <div style={{...defaultStyle, display: 'inline-block', width: '25%' }}>
-        <img src={playlist.imageUrl} style={{width: '60px'}} alt="" />
-        <h3>{playlist.name}</h3>
-        <ul>
-          {playlist.songs.map(song =>
-            <li key={song.name}>{song.name}</li>
-          )}
-        </ul>
-      </div>
-    );
-  }
-}
+// class Playlist extends Component {
+//   render() {
+//     let playlist = this.props.playlist;
+//     return (
+//       <div style={{...defaultStyle, 
+//         display: 'inline-block', 
+//         width: '25%',
+//         padding: '10px',
+//         // background: this.props.index % 2 ? '#C0C0C0' : '#808080' 
+//       }}>
+//         <img src={playlist.imageUrl} style={{width: '60px'}} alt="" />
+//         <h3>{playlist.name}</h3>
+//         <ul>
+//           {playlist.songs.map(song =>
+//             <li key={song.name}>{song.name}</li>
+//           )}
+//         </ul>
+//       </div>
+//     );
+//   }
+// }
 
 class App extends Component {
   constructor() {
@@ -107,7 +97,9 @@ class App extends Component {
       serverData: {},
       filterString: '',
       device_id: '',
-      playing: false
+      playing: false,
+      playlists: [],
+      selectedPlaylist: null
     }
     this.playerCheckInterval = null;
   }
@@ -132,9 +124,20 @@ class App extends Component {
     });
   }
 
+
+  displaySongs = (key) => {
+    console.log(key);
+    // console.log(this.state.play);
+    
+    const selectedPlaylist = this.state.playlists.find((playlist) => playlist.id === key)
+
+    console.log(selectedPlaylist);
+    
+    this.setState({ selectedPlaylist })
+  }
+
   checkForPlayer(){
     const { token } = this.state;
-    // console.log(window.Spotify);
     
     if(window.Spotify != null){
       clearInterval(this.playerCheckInterval);
@@ -198,11 +201,16 @@ class App extends Component {
         Promise.all(trackDataPromises);
       let playlistsPromise = allTracksDataPromises.then(trackDatas => {
         trackDatas.forEach((trackData, i) => {
+          console.log(trackData);
+          
           playlists[i].trackDatas = trackData.items
             .map(item => item.track)
             .map(trackData => ({
               name: trackData.name,
-              duration: trackData.duration_ms / 1000
+              duration: Math.round(trackData.duration_ms / 1000),
+              artists: trackData.artists,
+              album: trackData.album.name,
+              // id: trackdata.id
             }))
           })
         return playlists;
@@ -216,7 +224,9 @@ class App extends Component {
           return {
             name: item.name,
             imageUrl: item.images[0].url,
-            songs: item.trackDatas.slice(0,3)
+            // songs: item.trackDatas.slice(0,3)
+            id: item.id,
+            songs: item.trackDatas
           }
         })
       }))
@@ -238,17 +248,9 @@ class App extends Component {
         console.log(data);
         
         // const deviceId = data.devices ? data.devices.find((device) => device.type === "Smartphone") : data.devices[0].id;
-        let playerEndpoint = endpoint + `/player/play?device_id=${deviceId}`
         // console.log(deviceId);
         
-        fetch(endpoint + `/player/play?device_id=${deviceId}`, {
-          method: 'PUT',
-          headers: { 'Authorization': 'Bearer ' + ACCESS_TOKEN }
-        })
-        .then(response => console.log(response))
-          .then(data => {
-            // console.log(data);
-          })
+        
 
           this.setState({
             deviceType: deviceType
@@ -285,7 +287,7 @@ class App extends Component {
       },
       body: JSON.stringify({
         "device_ids": [deviceId],
-        "play": true,
+        "play": false,
       }),
     });
   }
@@ -320,13 +322,33 @@ class App extends Component {
     this.player.previousTrack();
   }
   onPlayClick() {
-    this.player.togglePlay();
+    
+    let playerEndpoint = `https://api.spotify.com/v1/me/player/play?device_id=${this.state.deviceId}`
+
+    if(this.state.deviceType ==="Computer"){
+      this.player.togglePlay();
+
+    }
+    else{
+      fetch(`https://api.spotify.com/v1/me/player/play?device_id=${this.state.deviceId}`, {
+        method: 'PUT',
+        headers: { 'Authorization': 'Bearer ' + this.state.token }
+      })
+        .then(response => console.log(response))
+        .then(data => {
+        })
+    }
   }
   onNextClick() {
     this.player.nextTrack();
   }
 
   render() {
+    const {
+      playing,
+      playlists,
+      selectedPlaylist
+    } = this.state;
     
     let playlistToRender = 
       this.state.user && 
@@ -340,33 +362,44 @@ class App extends Component {
         }) : []
     return (
       <div className="App">
-        {this.state.user ?
-          <div>
-            <h1 style={{ color: 'grey', 'fontSize': '54px' }}>
-              {this.state.user.name}'s Playlist
-        </h1>
-            <PlaylistCounter playlists={playlistToRender} />
-            <HoursCounter playlists={playlistToRender} />
-            <Filter onTextChange={text =>
-              this.setState({ filterString: text })} />
-            {playlistToRender.map(playlist =>
-             <Playlist 
-                key={playlist.imageUrl}
-                playlist={playlist} />
-            )}
-          </div> : <button onClick={() => {
-            window.location = window.location.href.includes('localhost') 
-              ? 'http://localhost:8888/login'
-              : 'https://mpfree-backend.herokuapp.com/login' }
-          }
-          style={{ padding: '20px', fontSize: '50px', marginTop: '20px' }}>Sign in with Spotify</button>
-        }
-        {this.state.deviceType === "Computer" 
-          ? <div className="player-controls">
-              <button onClick={() => this.onPrevClick()}>Previous</button>  
-              <button onClick={() => this.onPlayClick()}>{this.state.playing ? "Pause" : "Play"}</button> 
-              <button onClick={() => this.onNextClick()}>Next</button>  
-            </div>
+        {this.state.user && playlists ?
+          <React.Fragment>
+            <Navigation 
+              playlists={playlists}
+              displaySongs={this.displaySongs}  
+            />
+            <MainContent playlists={playlists} selectedPlaylist={selectedPlaylist} />
+            <Player />
+          </React.Fragment>
+
+        //   <div>
+        //     <h1 style={{ ...defaultStyle,
+        //        'fontSize': '54px',
+        //        'margin-top': '5px' }}>
+        //       {this.state.user.name}'s Playlist
+        // </h1>
+        //     <PlaylistCounter playlists={playlistToRender} />
+        //     <HoursCounter playlists={playlistToRender} />
+        //     <Filter onTextChange={text =>
+        //       this.setState({ filterString: text })} />
+        //     {/* {playlistToRender.map(playlist =>
+        //      <Playlist 
+        //         key={playlist.imageUrl}
+        //         playlist={playlist} />
+        //     )} */}
+        //   </div> : <button onClick={() => {
+        //     window.location = window.location.href.includes('localhost') 
+        //       ? 'http://localhost:8888/login'
+        //       : 'https://mpfree-backend.herokuapp.com/login' }
+        //   }
+        //   style={{ padding: '20px', fontSize: '50px', marginTop: '20px' }}>Sign in with Spotify</button>
+        // }
+        // {this.state.deviceType === "Computer" 
+        //   ? <div className="player-controls">
+        //       <div className="prev" onClick={() => this.onPrevClick()}><i className="fas fa-step-backward"></i></div>  
+        //       <div className="play" onClick={() => this.onPlayClick()}>{playing ? <i class="far fa-pause-circle"></i> : <i class="far fa-play-circle"></i>}</div> 
+        //       <div className="next" onClick={() => this.onNextClick()}><i className="fas fa-step-forward"></i></div>  
+        //     </div>
           : null }
 
       </div>
