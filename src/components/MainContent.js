@@ -41,7 +41,7 @@ class MainContent extends Component {
                             <li className="songtrack">
                                 <div className="playSong" onClick={() => this.handleClick(song.id)}><i class="far fa-play-circle"></i></div>
                                 <div className="songName">{song.name}</div>
-                                <div className="songArtists">{song.artists.map(artist => artist.name)}</div>
+                                <div className="songArtists">{song.artists.map((artist, i) => i > 0 ? ", " + artist.name : artist.name)}</div>
                                 <div className="songAlbum">{song.album}</div>
                                 <div className="songDuration">{this.calcTime(song.duration)}</div>
                             </li>

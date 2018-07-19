@@ -32,14 +32,8 @@ class Player extends Component {
                             <img src={selectedSong.image ? selectedSong.image.url : selectedSong.album.images[0].url} alt=""/>
                             <div className="artistInfo">
                                 <div>{selectedSong.name}</div>
-                                <div>{selectedSong.artists.map((artist, i) => {
-                                        if(i>0){
-                                            return ", " + artist.name;
-                                        }
-                                        else{
-                                            return artist.name;
-                                        }
-                                    }
+                                <div>{selectedSong.artists.map((artist, i) => 
+                                        i > 0 ? ", " + artist.name : artist.name
                                     )}
                                 </div>
                             </div>
