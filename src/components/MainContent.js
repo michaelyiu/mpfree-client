@@ -16,6 +16,10 @@ class MainContent extends Component {
 
         return minutes + ":" + seconds
     }
+    handleClick(selectedSong) {
+        this.props.playSongAndDisplay(selectedSong);
+        
+    }
     render(){
         const { playlists, selectedPlaylist } = this.props;
         
@@ -27,10 +31,12 @@ class MainContent extends Component {
                     ?   
                     
                         selectedPlaylist.songs.map((song) => {
-                        console.log(song.album);
                         return (
                             <React.Fragment>
-                               <div className="songtrack">{song.name + " " + song.artists.map(artist => artist.name) + " " + song.album + " " + this.calcTime(song.duration)}</div>
+                                <div className="songtrack">
+                                    <div className="playSong" onClick={() => this.handleClick(song.id)}><i class="far fa-play-circle"></i></div>
+                                        {song.name + " " + song.artists.map(artist => artist.name) + " " + song.album + " " + this.calcTime(song.duration)}
+                                    </div>
                             </React.Fragment>
                             
                     )}): null

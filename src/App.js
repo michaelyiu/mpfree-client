@@ -97,9 +97,11 @@ class App extends Component {
       serverData: {},
       filterString: '',
       device_id: '',
+      deviceType: null,
       playing: false,
       playlists: [],
-      selectedPlaylist: null
+      selectedPlaylist: null,
+      selectedSong: null
     }
     this.playerCheckInterval = null;
   }
@@ -124,15 +126,38 @@ class App extends Component {
     });
   }
 
+  playSongAndDisplay = (key) => {
+    const { selectedPlaylist } = this.state;
+    const selectedSong = selectedPlaylist ? selectedPlaylist.songs.find((song) => song.id === key) : null;
+    console.log(selectedSong.uri);
+    
+    console.log(this.state.selectedPlaylist.uri);
+    // const test = this.state.selectedPlaylist.uri.replace("user", "user:spotify:playlist");
+
+
+    //cannot play from SDK, its much simpler
+    fetch(`https://api.spotify.com/v1/me/player/play?device_id=${this.state.deviceId}`, {
+      method: 'PUT',
+      headers: { 'Authorization': 'Bearer ' + this.state.token },
+      // 'offset': {'position': 5 },
+      body: {
+        "uris": ["spotify:track:3Vo4wInECJQuz9BIBMOu8i"]
+      }
+    })
+    .then(response => console.log(response))
+      .then(data => {
+    })
+
+
+
+
+    this.setState({ selectedSong })
+  }
 
   displaySongs = (key) => {
-    console.log(key);
-    // console.log(this.state.play);
-    
     const selectedPlaylist = this.state.playlists.find((playlist) => playlist.id === key)
+console.log(selectedPlaylist);
 
-    console.log(selectedPlaylist);
-    
     this.setState({ selectedPlaylist })
   }
 
@@ -149,7 +174,6 @@ class App extends Component {
 
       //finally connect!
       this.player.connect();
-// console.log(this.player);
 
     }
   }
@@ -187,6 +211,7 @@ class App extends Component {
     }).then(response => response.json())
     .then(playlistData => {
       let playlists = playlistData.items;
+      
       let trackDataPromises = playlists.map(playlist => {
         let responsePromise = fetch(playlist.tracks.href, {
           headers: {
@@ -210,7 +235,9 @@ class App extends Component {
               duration: Math.round(trackData.duration_ms / 1000),
               artists: trackData.artists,
               album: trackData.album.name,
-              // id: trackdata.id
+              image: trackData.album.images[0].height,
+              id: trackData.id,
+              uri: trackData.uri
             }))
           })
         return playlists;
@@ -224,7 +251,7 @@ class App extends Component {
           return {
             name: item.name,
             imageUrl: item.images[0].url,
-            // songs: item.trackDatas.slice(0,3)
+            uri: item.uri,
             id: item.id,
             songs: item.trackDatas
           }
@@ -318,28 +345,27 @@ class App extends Component {
   }
 
 
-  onPrevClick(){
+  onPrevClick = () => {
     this.player.previousTrack();
   }
-  onPlayClick() {
+  onPlayClick = () => {
     
     let playerEndpoint = `https://api.spotify.com/v1/me/player/play?device_id=${this.state.deviceId}`
-
-    if(this.state.deviceType ==="Computer"){
+    
+    if(this.state.deviceType === "Computer"){
       this.player.togglePlay();
-
     }
     else{
       fetch(`https://api.spotify.com/v1/me/player/play?device_id=${this.state.deviceId}`, {
         method: 'PUT',
         headers: { 'Authorization': 'Bearer ' + this.state.token }
       })
-        .then(response => console.log(response))
+      .then(response => console.log(response))
         .then(data => {
-        })
+      })
     }
   }
-  onNextClick() {
+  onNextClick = () => {
     this.player.nextTrack();
   }
 
@@ -347,7 +373,8 @@ class App extends Component {
     const {
       playing,
       playlists,
-      selectedPlaylist
+      selectedPlaylist,
+      deviceType
     } = this.state;
     
     let playlistToRender = 
@@ -363,14 +390,34 @@ class App extends Component {
     return (
       <div className="App">
         {this.state.user && playlists ?
+          
+
+
           <React.Fragment>
             <Navigation 
               playlists={playlists}
               displaySongs={this.displaySongs}  
             />
-            <MainContent playlists={playlists} selectedPlaylist={selectedPlaylist} />
-            <Player />
-          </React.Fragment>
+            <MainContent 
+              playlists={playlists} 
+              selectedPlaylist={selectedPlaylist} 
+              playSongAndDisplay={this.playSongAndDisplay}
+            />
+            <Player 
+              playing={playing} 
+              deviceType={deviceType} 
+              onPrevClick={this.onPrevClick}
+              onPlayClick={this.onPlayClick}
+              onNextClick={this.onNextClick}
+            />
+          </React.Fragment> :
+
+          <button onClick={() => {
+            window.location = window.location.href.includes('localhost') 
+              ? 'http://localhost:8888/login'
+              : 'https://mpfree-backend.herokuapp.com/login' }
+          }
+          style={{ padding: '20px', fontSize: '50px', marginTop: '20px' }}>Sign in with Spotify</button>
 
         //   <div>
         //     <h1 style={{ ...defaultStyle,
@@ -400,7 +447,8 @@ class App extends Component {
         //       <div className="play" onClick={() => this.onPlayClick()}>{playing ? <i class="far fa-pause-circle"></i> : <i class="far fa-play-circle"></i>}</div> 
         //       <div className="next" onClick={() => this.onNextClick()}><i className="fas fa-step-forward"></i></div>  
         //     </div>
-          : null }
+          // : null }
+      }
 
       </div>
     );
