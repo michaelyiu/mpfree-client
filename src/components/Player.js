@@ -18,18 +18,31 @@ class Player extends Component {
     }
 
     render() {
-        const { playlist, playing, selectedSong } = this.props;
+        const { playing, selectedSong } = this.props;
         console.log(selectedSong);
         
         return (
             <React.Fragment>
                 <div className="player">
                     <div className="songInfo">
+                    {console.log(selectedSong)}
+                    
                     {selectedSong ?
                         <React.Fragment>
-                            <img src={selectedSong.image.url} alt=""/>
-                            <div>{selectedSong.name}</div>
-                            <div>{selectedSong.artists.map((artist => artist.name))}</div>
+                            <img src={selectedSong.image ? selectedSong.image.url : selectedSong.album.images[0].url} alt=""/>
+                            <div className="artistInfo">
+                                <div>{selectedSong.name}</div>
+                                <div>{selectedSong.artists.map((artist, i) => {
+                                        if(i>0){
+                                            return ", " + artist.name;
+                                        }
+                                        else{
+                                            return artist.name;
+                                        }
+                                    }
+                                    )}
+                                </div>
+                            </div>
                         </React.Fragment>
                     : null
                     }

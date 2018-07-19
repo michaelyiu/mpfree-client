@@ -84,7 +84,7 @@ html, body, .root, .App{
 }
 .playSong{
   text-align: center;
-  font-size: 40px;
+  font-size: 36px;
   flex-basis: 64px;
 }
 .songName, .songArtists, .songAlbum{
@@ -148,5 +148,13 @@ aside{
 .songInfo img{
   width: 64px;
   height: 64px;
+}
 
+.artistInfo{
+  display: flex;
+  flex-direction: column;
+}
+
+.artistInfo div{
+  margin: 8px 10px;
 }

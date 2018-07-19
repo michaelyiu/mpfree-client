@@ -350,21 +350,27 @@ console.log(selectedPlaylist);
     this.player.previousTrack();
   }
   onPlayClick = () => {
-    
-    let playerEndpoint = `https://api.spotify.com/v1/me/player/play?device_id=${this.state.deviceId}`
+    //might have to redo this one..
+    // let playerEndpoint = `https://api.spotify.com/v1/me/player/play?device_id=${this.state.deviceId}`
     
     if(this.state.deviceType === "Computer"){
       this.player.togglePlay();
+      console.log(this.player);
+      
     }
     else{
-      fetch(`https://api.spotify.com/v1/me/player/play?device_id=${this.state.deviceId}`, {
+      // fetch(`https://api.spotify.com/v1/me/player/play?device_id=${this.state.deviceId}`, {
+      fetch(`https://api.spotify.com/v1/me/player?device_id=${this.state.deviceId}`, {
         method: 'PUT',
         headers: { 'Authorization': 'Bearer ' + this.state.token }
       })
       .then(response => console.log(response))
         .then(data => {
+          console.log(data);
+          
       })
     }
+    // this.setState({  })
   }
   onNextClick = () => {
     this.player.nextTrack();
