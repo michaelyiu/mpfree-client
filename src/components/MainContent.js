@@ -25,24 +25,34 @@ class MainContent extends Component {
         
         return (
             <React.Fragment>
-                <div className="main-content">
-
+                <ul className="main-content">
                     {selectedPlaylist 
                     ?   
-                    
-                        selectedPlaylist.songs.map((song) => {
+                    <React.Fragment>
+                        <li class="songtrack trackLabels">
+                            <div className="playSong"></div>
+                            <div className="songName">TITLE</div>
+                            <div className="songArtists">ARTIST</div>
+                            <div className="songAlbum">ALBUM</div>
+                            <div className="songDuration"><i class="far fa-clock"></i></div>
+                        </li>
+                        {selectedPlaylist.songs.map((song) => {
                         return (
-                            <React.Fragment>
-                                <div className="songtrack">
-                                    <div className="playSong" onClick={() => this.handleClick(song.id)}><i class="far fa-play-circle"></i></div>
-                                        {song.name + " " + song.artists.map(artist => artist.name) + " " + song.album + " " + this.calcTime(song.duration)}
-                                    </div>
-                            </React.Fragment>
+                            <li className="songtrack">
+                                <div className="playSong" onClick={() => this.handleClick(song.id)}><i class="far fa-play-circle"></i></div>
+                                <div className="songName">{song.name}</div>
+                                <div className="songArtists">{song.artists.map(artist => artist.name)}</div>
+                                <div className="songAlbum">{song.album}</div>
+                                <div className="songDuration">{this.calcTime(song.duration)}</div>
+                            </li>
                             
-                    )}): null
+                            
+                    )})}
+                    </React.Fragment>
+                    : null
 
                     }
-                </div>
+                </ul>
             </React.Fragment>
 
         )

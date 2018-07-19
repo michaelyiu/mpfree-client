@@ -129,9 +129,9 @@ class App extends Component {
   playSongAndDisplay = (key) => {
     const { selectedPlaylist } = this.state;
     const selectedSong = selectedPlaylist ? selectedPlaylist.songs.find((song) => song.id === key) : null;
-    console.log(selectedSong.uri);
+    console.log(selectedSong);
     
-    console.log(this.state.selectedPlaylist.uri);
+    // console.log(this.state.selectedPlaylist.uri);
     // const test = this.state.selectedPlaylist.uri.replace("user", "user:spotify:playlist");
 
 
@@ -140,9 +140,11 @@ class App extends Component {
       method: 'PUT',
       headers: { 'Authorization': 'Bearer ' + this.state.token },
       // 'offset': {'position': 5 },
-      body: {
-        "uris": ["spotify:track:3Vo4wInECJQuz9BIBMOu8i"]
-      }
+      body: JSON.stringify({
+        // "uris": ["spotify:track:3Vo4wInECJQuz9BIBMOu8i"]
+        "context_uri": this.state.selectedPlaylist.uri,
+        "offset": {"position": selectedSong.offset}
+      })
     })
     .then(response => console.log(response))
       .then(data => {
@@ -226,18 +228,17 @@ console.log(selectedPlaylist);
         Promise.all(trackDataPromises);
       let playlistsPromise = allTracksDataPromises.then(trackDatas => {
         trackDatas.forEach((trackData, i) => {
-          console.log(trackData);
-          
           playlists[i].trackDatas = trackData.items
-            .map(item => item.track)
-            .map(trackData => ({
+            .map((item) => item.track)
+            .map((trackData, offset) => ({
               name: trackData.name,
               duration: Math.round(trackData.duration_ms / 1000),
               artists: trackData.artists,
               album: trackData.album.name,
-              image: trackData.album.images[0].height,
+              image: trackData.album.images[0],
               id: trackData.id,
-              uri: trackData.uri
+              uri: trackData.uri,
+              offset: offset
             }))
           })
         return playlists;
@@ -374,6 +375,7 @@ console.log(selectedPlaylist);
       playing,
       playlists,
       selectedPlaylist,
+      selectedSong,
       deviceType
     } = this.state;
     
@@ -403,21 +405,29 @@ console.log(selectedPlaylist);
               selectedPlaylist={selectedPlaylist} 
               playSongAndDisplay={this.playSongAndDisplay}
             />
+            <div className="filler"></div>
             <Player 
               playing={playing} 
               deviceType={deviceType} 
               onPrevClick={this.onPrevClick}
               onPlayClick={this.onPlayClick}
               onNextClick={this.onNextClick}
+              selectedSong={selectedSong}
             />
           </React.Fragment> :
-
-          <button onClick={() => {
-            window.location = window.location.href.includes('localhost') 
-              ? 'http://localhost:8888/login'
-              : 'https://mpfree-backend.herokuapp.com/login' }
-          }
-          style={{ padding: '20px', fontSize: '50px', marginTop: '20px' }}>Sign in with Spotify</button>
+          <React.Fragment>
+            <div className="loginContainer">
+              <h1>Mike's Spotify Recreation</h1>
+              <p>Hi! This app requires you to have a Spotify account. Please sign up for one on their website!</p>
+              <p>This app currently does not support mobile. Sorry for the inconvenience!</p>
+              <button className="login" onClick={() => {
+                window.location = window.location.href.includes('localhost') 
+                  ? 'http://localhost:8888/login'
+                  : 'https://mpfree-backend.herokuapp.com/login' }
+              }
+              >SIGN IN WITH SPOTIFY</button>
+            </div>
+          </React.Fragment>
 
         //   <div>
         //     <h1 style={{ ...defaultStyle,

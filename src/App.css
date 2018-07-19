@@ -14,8 +14,37 @@ html, body, .root, .App{
   margin: 0;
 }
 
+.loginContainer{
+  display: flex;
+  flex-direction: column;
+  align-content: center;
+}
+.login{
+  background-color: #1db954;
+  border-radius: 12px;
+  border: none;
+  height: 30px;
+  width: 400px;
+  color: white;
+  align-self: center;
+  margin-top: 50px;
+}
+
+.loginContainer h1{
+  font-size: 60px;
+  margin: 40px;
+}
+
+.loginContainer p{
+  font-size: 20px;
+  margin: 20px 0;
+}
+
+
 .App{
   display: flex;
+  justify-content: center;
+  align-items: center;
 }
 /* body{ */
   /* padding: 10%; */
@@ -27,24 +56,45 @@ html, body, .root, .App{
   width: 20%;
   height: calc(100% - 120px);
   padding: 100px 25px;
+  align-self: flex-start;
   margin: 0;
 }
 
 .main-content{
   background-color: #1a1a1a;
   width: 60%;
+  align-self: flex-start;
   height: calc(100% - 120px);
   overflow-y: auto;
 }
-
+.filler{
+  width: 20%;
+}
 .songtrack{
-  padding: 20px 0;
+  display: flex;
+  align-items: center;
+  padding: 10px 0;
   margin-left: 40px;
+  margin-right: 20px;
   border-bottom: 1px solid #828282;
 }
 .songtrack:hover{
   background-color: #b3b3b3;
   color: white;
+}
+.playSong{
+  text-align: center;
+  font-size: 40px;
+  flex-basis: 64px;
+}
+.songName, .songArtists, .songAlbum{
+  width: 32%;
+  
+}
+
+.songDuration
+{
+  width: 4%;
 }
 
 /* sidebar with the friends and stuff.. may not care about this one. */
@@ -74,11 +124,28 @@ aside{
   width: 100%;
   align-items: center;
   justify-content: center;
+
 }
 
 .media-controls{
+  width: 33%;
   display: flex;
-  /* position: relative; */
   text-align: center;
+  justify-content: center;
   font-size: 50px;
+}
+
+.songInfo{
+  display: flex;
+  width: 33%;
+  padding: 20px;
+}
+
+.player-misc{
+  width: 33%;
+}
+
+.songInfo img{
+  width: 64px;
+
 }
