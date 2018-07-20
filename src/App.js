@@ -5,90 +5,54 @@ import Player from './components/Player';
 import 'reset-css/reset.css';
 import './App.css';
 
-let defaultTextColor = 'grey';
-let defaultStyle={
-  color: defaultTextColor,
-  'font-family': 'Helvetica'
-}
-let counterStyle = {
-  ...defaultStyle,
-  width: "40%",
-  display: 'inline-block',
-  margin: '0 auto',
-  'margin-bottom': '20px',
-  'fontSize': '20px',
-  'line-height': '30px',
-  'textAlign': 'center'
-}
-
-class PlaylistCounter extends Component {
-  render() {
-    return (
-      <div style={counterStyle}>
-        <h2>{this.props.playlists.length} playlists</h2>
-      </div>
-    );
-  }
-}
-
-class HoursCounter extends Component {
-  
-  render() {
-    let allSongs = this.props.playlists.reduce((songs, eachPlaylist) => {
-      return songs.concat(eachPlaylist.songs);
-    }, []);
-    let totalDuration = Math.round(allSongs.reduce((sum, eachSong) => {
-      return sum + eachSong.duration
-    }, 0) / 60)
-    
-    return (
-      <div style={counterStyle}>
-        <h2>{totalDuration} hours</h2>
-      </div>
-    );
-  }
-}
-
-class Filter extends Component {
-  render() {
-    return (
-      <div style={{ color: defaultTextColor }}>
-        <img src="" alt="" />
-        <input type="text" onKeyUp={event =>
-          this.props.onTextChange(event.target.value)} 
-          style={{...defaultStyle, 
-            color: 'black', 
-            'font-size': '20px', 
-            padding: '10px',
-            margin: '20px'
-          }}
-            />
-      </div>
-    )
-  }
-}
-
-// class Playlist extends Component {
+// class PlaylistCounter extends Component {
 //   render() {
-//     let playlist = this.props.playlist;
 //     return (
-//       <div style={{...defaultStyle, 
-//         display: 'inline-block', 
-//         width: '25%',
-//         padding: '10px',
-//         // background: this.props.index % 2 ? '#C0C0C0' : '#808080' 
-//       }}>
-//         <img src={playlist.imageUrl} style={{width: '60px'}} alt="" />
-//         <h3>{playlist.name}</h3>
-//         <ul>
-//           {playlist.songs.map(song =>
-//             <li key={song.name}>{song.name}</li>
-//           )}
-//         </ul>
+//       <div style={counterStyle}>
+//         <h2>{this.props.playlists.length} playlists</h2>
 //       </div>
 //     );
 //   }
 // }
+
+// class HoursCounter extends Component {
+  
+//   render() {
+//     let allSongs = this.props.playlists.reduce((songs, eachPlaylist) => {
+//       return songs.concat(eachPlaylist.songs);
+//     }, []);
+//     let totalDuration = Math.round(allSongs.reduce((sum, eachSong) => {
+//       return sum + eachSong.duration
+//     }, 0) / 60)
+    
+//     return (
+//       <div style={counterStyle}>
+//         <h2>{totalDuration} hours</h2>
+//       </div>
+//     );
+//   }
+// }
+
+// class Filter extends Component {
+//   render() {
+//     return (
+//       <div style={{ color: defaultTextColor }}>
+//         <img src="" alt="" />
+//         <input type="text" onKeyUp={event =>
+//           this.props.onTextChange(event.target.value)} 
+//           style={{...defaultStyle, 
+//             color: 'black', 
+//             'font-size': '20px', 
+//             padding: '10px',
+//             margin: '20px'
+//           }}
+//             />
+//       </div>
+//     )
+//   }
+// }
+
+
 
 class App extends Component {
   constructor() {
@@ -131,17 +95,12 @@ class App extends Component {
     const selectedSong = selectedPlaylist ? selectedPlaylist.songs.find((song) => song.id === key) : null;
     console.log(selectedSong);
     
-    // console.log(this.state.selectedPlaylist.uri);
-    // const test = this.state.selectedPlaylist.uri.replace("user", "user:spotify:playlist");
-
-
     //cannot play from SDK, its much simpler
     fetch(`https://api.spotify.com/v1/me/player/play?device_id=${this.state.deviceId}`, {
       method: 'PUT',
       headers: { 'Authorization': 'Bearer ' + this.state.token },
       // 'offset': {'position': 5 },
       body: JSON.stringify({
-        // "uris": ["spotify:track:3Vo4wInECJQuz9BIBMOu8i"]
         "context_uri": this.state.selectedPlaylist.uri,
         "offset": {"position": selectedSong.offset}
       })
@@ -158,7 +117,7 @@ class App extends Component {
 
   displaySongs = (key) => {
     const selectedPlaylist = this.state.playlists.find((playlist) => playlist.id === key)
-console.log(selectedPlaylist);
+    console.log(selectedPlaylist);
 
     this.setState({ selectedPlaylist })
   }
@@ -213,6 +172,7 @@ console.log(selectedPlaylist);
     }).then(response => response.json())
     .then(playlistData => {
       let playlists = playlistData.items;
+      console.log(playlists);
       
       let trackDataPromises = playlists.map(playlist => {
         let responsePromise = fetch(playlist.tracks.href, {
@@ -254,7 +214,8 @@ console.log(selectedPlaylist);
             imageUrl: item.images[0].url,
             uri: item.uri,
             id: item.id,
-            songs: item.trackDatas
+            songs: item.trackDatas,
+            owner: item.owner.display_name
           }
         })
       }))

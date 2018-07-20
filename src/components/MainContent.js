@@ -1,16 +1,16 @@
 import React, { Component } from 'react';
-import Playlist from './Playlist';
+import PlaylistInfo from './PlaylistInfo';
 
 class MainContent extends Component {
-    constructor(props){
-        super(props);
-    }
+    // constructor(props){
+    //     super(props);
+    // }
 
     calcTime(duration){
         let minutes = Math.floor(duration / 60);
         let seconds = duration % 60;
         
-        if (seconds.toString().length == 1){
+        if (seconds.toString().length === 1){
             seconds = "0" + seconds;
         }
 
@@ -21,7 +21,7 @@ class MainContent extends Component {
         
     }
     render(){
-        const { playlists, selectedPlaylist } = this.props;
+        const { selectedPlaylist } = this.props;
         
         return (
             <React.Fragment>
@@ -29,6 +29,7 @@ class MainContent extends Component {
                     {selectedPlaylist 
                     ?   
                     <React.Fragment>
+                        <PlaylistInfo selectedPlaylist={selectedPlaylist}/>
                         <li class="songtrack trackLabels">
                             <div className="playSong"></div>
                             <div className="songName">TITLE</div>

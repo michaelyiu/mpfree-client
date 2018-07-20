@@ -2,9 +2,9 @@ import React, { Component } from 'react';
 import Playlist from './Playlist';
 
 class Navigation extends Component{
-    constructor(props){
-        super(props);
-    }
+    // constructor(props){
+    //     super(props);
+    // }
     render(){
         // console.log(this.props.playlists);
         const { playlists } = this.props;
