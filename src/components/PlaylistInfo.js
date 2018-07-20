@@ -47,7 +47,7 @@ class PlaylistInfo extends Component {
                     <div className="playlist-info">
                         <div>PLAYLIST</div>
                         <div className="playlist-name">{selectedPlaylist.name}</div>
-                        <div className="playlist-name">Created by {selectedPlaylist.owner} dot {selectedPlaylist.songs.length} songs, {this.calcPlaylistTime()}</div>
+                        <div className="playlist-name">Created by {selectedPlaylist.owner} · {selectedPlaylist.songs.length} songs, {this.calcPlaylistTime()}</div>
                         <button className="playlist-play">PLAY</button>
                     </div>
                 </div>
