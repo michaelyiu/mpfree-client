@@ -5,34 +5,6 @@ import Player from './components/Player';
 import 'reset-css/reset.css';
 import './App.css';
 
-// class PlaylistCounter extends Component {
-//   render() {
-//     return (
-//       <div style={counterStyle}>
-//         <h2>{this.props.playlists.length} playlists</h2>
-//       </div>
-//     );
-//   }
-// }
-
-// class HoursCounter extends Component {
-  
-//   render() {
-//     let allSongs = this.props.playlists.reduce((songs, eachPlaylist) => {
-//       return songs.concat(eachPlaylist.songs);
-//     }, []);
-//     let totalDuration = Math.round(allSongs.reduce((sum, eachSong) => {
-//       return sum + eachSong.duration
-//     }, 0) / 60)
-    
-//     return (
-//       <div style={counterStyle}>
-//         <h2>{totalDuration} hours</h2>
-//       </div>
-//     );
-//   }
-// }
-
 // class Filter extends Component {
 //   render() {
 //     return (
@@ -51,8 +23,6 @@ import './App.css';
 //     )
 //   }
 // }
-
-
 
 class App extends Component {
   constructor() {
@@ -238,11 +208,6 @@ class App extends Component {
           ? data.devices.find((device) => device.type === "Smartphone").id : data.devices[0].id;
         const deviceType = data.devices.find((device) => device.type === "Smartphone")
           ? data.devices.find((device) => device.type === "Smartphone").type : data.devices[0].type;
-        // console.log(data);
-        
-        // const deviceId = data.devices ? data.devices.find((device) => device.type === "Smartphone") : data.devices[0].id;
-        // console.log(deviceId);
-        
         
 
           this.setState({
@@ -251,16 +216,6 @@ class App extends Component {
 
       }
     );
-
-    // fetch(endpoint + '/player', {
-    //   headers: { 'Authorization': 'Bearer ' + ACCESS_TOKEN }
-    // // }).then(response => response.json())
-    // }).then(response => console.log(response))
-    // .then(data => {
-    //     // console.log(data);
-    //   });
-
-
 
       this.setState({
         token: ACCESS_TOKEN
@@ -316,11 +271,6 @@ class App extends Component {
     fetch(`https://api.spotify.com/v1/me/player/shuffle?device_id=${this.state.deviceId}&state=${shuffleState}`, {
       method: 'PUT',
       headers: { 'Authorization': 'Bearer ' + this.state.token },
-      // 'offset': {'position': 5 },
-      // body: JSON.stringify({
-      //   "context_uri": this.state.selectedPlaylist.uri,
-      //   "offset": { "position": selectedSong.offset }
-      // })
     })
       .then(response => console.log(response))
       .then(data => {
@@ -351,11 +301,9 @@ class App extends Component {
   }
   onPlayClick = () => {
     //might have to redo this one..
-    // let playerEndpoint = `https://api.spotify.com/v1/me/player/play?device_id=${this.state.deviceId}`
     let endpoint;
     
     this.state.playing ? endpoint = `https://api.spotify.com/v1/me/player/pause?device_id=${this.state.deviceId}` : endpoint = `https://api.spotify.com/v1/me/player/play?device_id=${this.state.deviceId}`;
-    // fetch(`https://api.spotify.com/v1/me/player/play?device_id=${this.state.deviceId}`, {
       fetch(endpoint, {
         method: 'PUT',
         headers: { 'Authorization': 'Bearer ' + this.state.token },
@@ -388,14 +336,11 @@ class App extends Component {
         console.log(selectedSong);
 
         this.setState({ selectedSong })
-        // }data.item;
       })
       // this.setState({})
   }
   
   onNextClick = () => {
-    // this.onPlayClick();
-    // this.onPlayClick();    
     // fetch(`https://api.spotify.com/v1/me/player/next?device_id=${this.state.deviceId}`, {
     //   method: 'POST',
     //   headers: { 'Authorization': 'Bearer ' + this.state.token },
@@ -436,16 +381,16 @@ class App extends Component {
       deviceType
     } = this.state;
     
-    let playlistToRender = 
-      this.state.user && 
-      this.state.playlists
-        ? this.state.playlists.filter(playlist => {
-          let matchesPlaylist = playlist.name.toLowerCase().includes(
-            this.state.filterString.toLowerCase())
-          let matchesSong = playlist.songs.filter(song => song.name.toLowerCase()
-            .includes(this.state.filterString.toLowerCase()));
-          return matchesPlaylist || matchesSong.length > 0
-        }) : []
+    // let playlistToRender = 
+    //   this.state.user && 
+    //   this.state.playlists
+    //     ? this.state.playlists.filter(playlist => {
+    //       let matchesPlaylist = playlist.name.toLowerCase().includes(
+    //         this.state.filterString.toLowerCase())
+    //       let matchesSong = playlist.songs.filter(song => song.name.toLowerCase()
+    //         .includes(this.state.filterString.toLowerCase()));
+    //       return matchesPlaylist || matchesSong.length > 0
+    //     }) : []
     return (
       <div className="App">
         {this.state.user && playlists ?
