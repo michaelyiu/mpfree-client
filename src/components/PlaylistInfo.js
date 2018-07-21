@@ -11,7 +11,7 @@ class PlaylistInfo extends Component {
             return total + song.duration;
         }, 0);
 
-        console.log(selectedPlaylist);
+        // console.log(selectedPlaylist);
         
         // let minutes = Math.floor(duration / 60);
         // let seconds = duration % 60;
@@ -35,10 +35,16 @@ class PlaylistInfo extends Component {
 
         return hours +  " hr " + minutes + " min";
     }   
+    handleClick = () => {
+        const { selectedPlaylist } = this.props;
+        console.log(selectedPlaylist);
+
+        this.props.onPlayClick();
+    }
 
     render() {
         const { selectedPlaylist } = this.props;
-        console.log(this.calcPlaylistTime());
+        // console.log(this.calcPlaylistTime());
         
         return (
             <React.Fragment>
@@ -48,7 +54,7 @@ class PlaylistInfo extends Component {
                         <div>PLAYLIST</div>
                         <div className="playlist-name">{selectedPlaylist.name}</div>
                         <div className="playlist-name">Created by {selectedPlaylist.owner} · {selectedPlaylist.songs.length} songs, {this.calcPlaylistTime()}</div>
-                        <button className="playlist-play">PLAY</button>
+                        <button className="playlist-play" onClick={this.handleClick}>PLAY</button>
                     </div>
                 </div>
             </React.Fragment>

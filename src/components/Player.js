@@ -1,10 +1,30 @@
 import React, { Component } from 'react';
 
 class Player extends Component {
-    // constructor(props) {
-    //     super(props);
-    // }
+    constructor(props) {
+        super(props);
+        this.state = ({
+            shuffleActive: false,
+            repeatActive: false
+        })
+    }
+    handleRepeat(){
+        let { repeatActive } = this.state
+        repeatActive = !repeatActive;this.props.onRepeatClick();
 
+        this.setState({
+            repeatActive
+        })
+    }
+    handleShuffle(){
+        let { shuffleActive } = this.state
+        shuffleActive = !shuffleActive;
+        
+        this.setState({
+            shuffleActive
+        })
+        this.props.onShuffleClick();
+    }
     handlePlay(){
         this.props.onPlayClick();
     }
@@ -19,7 +39,9 @@ class Player extends Component {
 
     render() {
         const { playing, selectedSong } = this.props;
-        // console.log(selectedSong);
+        console.log(selectedSong);
+        const { shuffleActive, repeatActive } = this.state;
+        
         
         return (
             <React.Fragment>
@@ -42,11 +64,11 @@ class Player extends Component {
                     }
                     </div>
                     <div className="media-controls">
-                        <div className="shuffle"><i class="fas fa-random"></i></div>
+                        <div className={shuffleActive ? "shuffle control-active" : "shuffle"} onClick={() => this.handleShuffle()}><i class="fas fa-random"></i></div>
                         <div className="prev" onClick={() => this.handlePrev()}><i className="fas fa-step-backward"></i></div>  
                         <div className="play" onClick={() => this.handlePlay()}>{playing ? <i className="far fa-pause-circle"></i> : <i className="far fa-play-circle"></i>}</div>
                         <div className="next" onClick={() => this.handleNext()}><i className="fas fa-step-forward"></i></div>  
-                        <div className="repeat"><i class="fas fa-redo"></i></div>
+                        <div className={repeatActive ? "repeat control-active" : "repeat"} onClick={() => this.handleRepeat()}><i class="fas fa-redo"></i></div>
 
                     </div>
                     <div className="player-misc">

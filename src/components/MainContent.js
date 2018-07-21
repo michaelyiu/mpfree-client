@@ -29,7 +29,15 @@ class MainContent extends Component {
                     {selectedPlaylist 
                     ?   
                     <React.Fragment>
-                        <PlaylistInfo selectedPlaylist={selectedPlaylist}/>
+                        <PlaylistInfo 
+                            selectedPlaylist={selectedPlaylist}
+                            onPlayClick={this.props.onPlayClick}
+                        />
+                        <div class="playlist-search-container">
+                            <i class="fas fa-search"></i>
+                            <input class="playlist-search" type="text" placeholder="Filter" />
+                        </div>
+
                         <li class="songtrack trackLabels">
                             <div className="playSong"></div>
                             <div className="songName">TITLE</div>
