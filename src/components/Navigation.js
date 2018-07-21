@@ -13,7 +13,10 @@ class Navigation extends Component{
                 <div className="library">YOUR LIBRARY</div>
                 <div className="playlists">PLAYLISTS</div>
                 {playlists.map(key => (
-                    <Playlist playlist={key} displaySongs={this.props.displaySongs}/>
+                    <Playlist 
+                        playlist={key} 
+                        displaySongs={this.props.displaySongs}
+                        playlists={this.props.playlists} />
                 ))}
             </div>
         )

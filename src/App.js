@@ -35,6 +35,7 @@ class App extends Component {
       playing: false,
       playlists: [],
       selectedPlaylist: null,
+      
       selectedSong: null,
       shuffleState: false
     }
@@ -63,34 +64,28 @@ class App extends Component {
 
   playSongAndDisplay = (key) => {
     
-    const { selectedPlaylist } = this.state;
+    const { selectedPlaylist, deviceId, token } = this.state;
     //selectedPlaylist almost always exists, but that doesnt mean it can find the song ID...
     const selectedSong = selectedPlaylist ? selectedPlaylist.songs.find((song) => song.id === key) : key;
 
-    console.log(selectedSong);
+    // console.log(selectedSong);
     
     //cannot play from SDK, its much simpler
-      fetch(`https://api.spotify.com/v1/me/player/play?device_id=${this.state.deviceId}`, {
+      fetch(`https://api.spotify.com/v1/me/player/play?device_id=${deviceId}`, {
         method: 'PUT',
-        headers: { 'Authorization': 'Bearer ' + this.state.token },
+        headers: { 'Authorization': 'Bearer ' + token },
         // 'offset': {'position': 5 },
         body: JSON.stringify({
-          "context_uri": this.state.selectedPlaylist.uri,
+          "context_uri": selectedPlaylist.uri,
           "offset": {"position": selectedSong.offset}
         })
       })
-
-
 
     this.setState({ selectedSong })
   }
 
   displaySongs = (key) => {
-    console.log(key);
-    
     const selectedPlaylist = this.state.playlists.find((playlist) => playlist.id === key)
-    console.log(selectedPlaylist);
-
     this.setState({ selectedPlaylist })
   }
 
@@ -146,7 +141,7 @@ class App extends Component {
     }).then(response => response.json())
     .then(playlistData => {
       let playlists = playlistData.items;
-      console.log(playlists);
+      // console.log(playlists);
       
       let trackDataPromises = playlists.map(playlist => {
         let responsePromise = fetch(playlist.tracks.href, {
@@ -284,19 +279,16 @@ class App extends Component {
 
   onPrevClick = () => {
     
-    // fetch(`https://api.spotify.com/v1/me/player/previous?device_id=${this.state.deviceId}`, {
-    //   method: 'POST',
-    //   headers: { 'Authorization': 'Bearer ' + this.state.token },
-    //   // 'offset': {'position': 5 },
-    //   // body: JSON.stringify({
-    //     //   "context_uri": this.state.selectedPlaylist.uri,
-    //     //   "offset": { "position": selectedSong.offset }
-    //     // })
-    //   })
-    //   .then(response => console.log(response))
-    //   .then(data => {
-    //   })
-    this.player.previousTrack();
+    fetch(`https://api.spotify.com/v1/me/player/previous?device_id=${this.state.deviceId}`, {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + this.state.token },
+      })
+      .then(response => response.json())
+      .then(data => {
+        console.log(data);
+        
+      })
+    // this.player.previousTrack();
     this.updateCurrentlyPlaying();    
   }
   onPlayClick = () => {
@@ -315,14 +307,16 @@ class App extends Component {
     }
     
   updateCurrentlyPlaying(){
+    const { deviceId, token } = this.state;
+
     let selectedSong;
-    fetch(`https://api.spotify.com/v1/me/player/currently-playing?device_id=${this.state.deviceId}`, {
+    fetch(`https://api.spotify.com/v1/me/player/currently-playing?device_id=${deviceId}`, {
       method: 'GET',
-      headers: { 'Authorization': 'Bearer ' + this.state.token },
+      headers: { 'Authorization': 'Bearer ' + token },
     })
       .then(response => response.json())
       .then(data => {
-        console.log(data)
+        // console.log(data)
         selectedSong = {
           name: data.item.name,
           duration: Math.round(data.item.duration_ms / 1000),
@@ -333,41 +327,37 @@ class App extends Component {
           uri: data.item.uri,
           offset: data.offset
         }
-        console.log(selectedSong);
-
         this.setState({ selectedSong })
       })
-      // this.setState({})
   }
   
   onNextClick = () => {
-    // fetch(`https://api.spotify.com/v1/me/player/next?device_id=${this.state.deviceId}`, {
-    //   method: 'POST',
-    //   headers: { 'Authorization': 'Bearer ' + this.state.token },
-    // })
-    // .then(response => {
-    //   response.json()
-    // })
-    this.player.nextTrack();
-    this.updateCurrentlyPlaying();    
+    fetch(`https://api.spotify.com/v1/me/player/next?device_id=${this.state.deviceId}`, {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + this.state.token },
+    })
+      .then(response => response.json())
+      .then(data => {
+        console.log(data);
+
+      })
+    // this.player.previousTrack();
+    this.updateCurrentlyPlaying();   
+
+    
+    // this.player.nextTrack();
   }
   
   onRepeatClick = () => {
-    let { repeatState } = this.state;
+    let { repeatState, deviceId, token } = this.state;
     repeatState = !repeatState;
     let repeat;
     repeatState ? repeat = "context" : repeat = "off";
 
-    fetch(`https://api.spotify.com/v1/me/player/repeat?device_id=${this.state.deviceId}&state=${repeat}`, {
+    fetch(`https://api.spotify.com/v1/me/player/repeat?device_id=${deviceId}&state=${repeat}`, {
       method: 'POST',
-      headers: { 'Authorization': 'Bearer ' + this.state.token },
-      // 'offset': {'position': 5 },
-      // body: JSON.stringify({
-      //   "context_uri": this.state.selectedPlaylist.uri,
-      //   "offset": { "position": selectedSong.offset }
-      // })
-    })
-      .then(response => console.log(response))
+      headers: { 'Authorization': 'Bearer ' + token },
+    }).then(response => console.log(response))
       .then(data => {
       })
   }
@@ -395,7 +385,6 @@ class App extends Component {
       <div className="App">
         {this.state.user && playlists ?
           
-
 
           <React.Fragment>
             <Navigation 

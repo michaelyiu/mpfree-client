@@ -39,7 +39,6 @@ class Player extends Component {
 
     render() {
         const { playing, selectedSong } = this.props;
-        console.log(selectedSong);
         const { shuffleActive, repeatActive } = this.state;
         
         
