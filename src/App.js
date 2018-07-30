@@ -28,18 +28,20 @@ class App extends Component {
   constructor() {
     super();
     this.state = {
-      serverData: {},
-      filterString: '',
+      baseUrl: 'https://api.spotify.com/v1/me/player',
       device_id: '',
       deviceType: null,
-      playing: false,
+      filterString: '',
       playlists: [],
+      playing: false,
       selectedPlaylist: null,
-      
       selectedSong: null,
-      shuffleState: false
+      shuffleState: false,
+      volume: 50,
+      // serverData: {},
     }
     this.playerCheckInterval = null;
+    this.updateCurrentlyPlaying = this.updateCurrentlyPlaying.bind(this);
   }
    createEventHandlers() {
     this.player.on('initialization_error', e => { console.error(e); });
@@ -64,14 +66,11 @@ class App extends Component {
 
   playSongAndDisplay = (key) => {
     
-    const { selectedPlaylist, deviceId, token } = this.state;
+    const { selectedPlaylist, deviceId, token, baseUrl } = this.state;
     //selectedPlaylist almost always exists, but that doesnt mean it can find the song ID...
     const selectedSong = selectedPlaylist ? selectedPlaylist.songs.find((song) => song.id === key) : key;
 
-    // console.log(selectedSong);
-    
-    //cannot play from SDK, its much simpler
-      fetch(`https://api.spotify.com/v1/me/player/play?device_id=${deviceId}`, {
+      fetch(`${baseUrl}/play?device_id=${deviceId}`, {
         method: 'PUT',
         headers: { 'Authorization': 'Bearer ' + token },
         // 'offset': {'position': 5 },
@@ -115,7 +114,7 @@ class App extends Component {
     }
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     const url_string = window.location;
     const url = new URL(url_string);
     const ACCESS_TOKEN = url.searchParams.get("access_token");
@@ -198,7 +197,7 @@ class App extends Component {
       fetch(endpoint + '/player/devices', {
         headers: { 'Authorization': 'Bearer ' + ACCESS_TOKEN }
       }).then(response => response.json())
-      .then(data => {
+      .then(async data => {
         const deviceId = data.devices.find((device) => device.type === "Smartphone") 
           ? data.devices.find((device) => device.type === "Smartphone").id : data.devices[0].id;
         const deviceType = data.devices.find((device) => device.type === "Smartphone")
@@ -208,62 +207,78 @@ class App extends Component {
           this.setState({
             deviceType: deviceType
           })
+          
+        }
+      );
 
-      }
-    );
-
+      
+      
       this.setState({
         token: ACCESS_TOKEN
       }, )
-
+      
       this.playerCheckInterval = setInterval(() => this.checkForPlayer(), 1000);
-  }
-
-
-  transferPlaybackHere(){
-    const { deviceId, token } = this.state;
-    fetch("https://api.spotify.com/v1/me/player", {
-      method: "PUT",
-      headers: {
-        authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        "device_ids": [deviceId],
-        "play": false,
-      }),
-    });
-  }
-
-  onStateChanged(state) {
-    // if we're no longer listening to music, we'll get a null state.
-    if (state !== null) {
-      // const {
-      //   current_track: currentTrack,
-      //   position,
-      //   duration,
-      // } = state.track_window;
-      // const trackName = currentTrack.name;
-      // const albumName = currentTrack.album.name;
-      // const artistName = currentTrack.artists
-      //   .map(artist => artist.name)
-      //   .join(", ");
+    }
+    
+    
+    async transferPlaybackHere(){
+      const { deviceId, token, volume, baseUrl } = this.state;
+      fetch("https://api.spotify.com/v1/me/player", {
+        method: "PUT",
+        headers: {
+          authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          "device_ids": [deviceId],
+          "play": false,
+        }),
+      });
+      
+      await fetch(`${baseUrl}/volume?volume_percent=${volume}&device_id=${deviceId}`, {
+        method: "PUT",
+        headers: { 'Authorization': 'Bearer ' + token }
+      })
+      // .then(response => response.json())
+      .then(data => {
+        console.log(data);
+  
+      })
+      
+      
+    }
+    
+    onStateChanged(state) {
+      // if we're no longer listening to music, we'll get a null state.
+      if (state !== null) {
+        const {
+        current_track: currentTrack,
+        position,
+        duration,
+      } = state.track_window;
+      // console.log(currentTrack);
+      
+      const trackName = currentTrack.name;
+      const albumName = currentTrack.album.name;
+      const artistName = currentTrack.artists
+        .map(artist => artist.name)
+        .join(", ");
       const playing = !state.paused;
       this.setState({
-        // position,
-        // duration,
-        // trackName,
-        // albumName,
-        // artistName,
+        position,
+        duration,
+        trackName,
+        albumName,
+        artistName,
         playing
       });
     }
   }
 
   onShuffleClick = () => {
-    let { shuffleState } = this.state;
+    let { shuffleState, baseUrl } = this.state;
     shuffleState = !shuffleState;
-    fetch(`https://api.spotify.com/v1/me/player/shuffle?device_id=${this.state.deviceId}&state=${shuffleState}`, {
+    fetch(`${baseUrl}/shuffle?device_id=${this.state.deviceId}&state=${shuffleState}`, {
       method: 'PUT',
       headers: { 'Authorization': 'Bearer ' + this.state.token },
     })
@@ -278,10 +293,16 @@ class App extends Component {
   }
 
   onPrevClick = () => {
+    const { baseUrl, deviceId, token } = this.state;
+
+    this.setState({ previousSong: this.state.selectedSong })
+    console.log(deviceId);
     
-    fetch(`https://api.spotify.com/v1/me/player/previous?device_id=${this.state.deviceId}`, {
+
+    
+    fetch(`${baseUrl}/previous?device_id=${deviceId}`, {
       method: 'POST',
-      headers: { 'Authorization': 'Bearer ' + this.state.token },
+      headers: { 'Authorization': 'Bearer ' + token },
       })
       .then(response => response.json())
       .then(data => {
@@ -293,12 +314,17 @@ class App extends Component {
   }
   onPlayClick = () => {
     //might have to redo this one..
+    const { baseUrl, token, deviceId } = this.state;
+
     let endpoint;
     
-    this.state.playing ? endpoint = `https://api.spotify.com/v1/me/player/pause?device_id=${this.state.deviceId}` : endpoint = `https://api.spotify.com/v1/me/player/play?device_id=${this.state.deviceId}`;
+    this.state.playing ? 
+      endpoint = `${baseUrl}/pause?device_id=${deviceId}` 
+      : endpoint = `${baseUrl}/play?device_id=${deviceId}`;
+
       fetch(endpoint, {
         method: 'PUT',
-        headers: { 'Authorization': 'Bearer ' + this.state.token },
+        headers: { 'Authorization': 'Bearer ' + token },
       })
       
       
@@ -306,69 +332,103 @@ class App extends Component {
       
     }
     
-  updateCurrentlyPlaying(){
-    const { deviceId, token } = this.state;
+  updateCurrentlyPlaying = () => {
+    
+    const { token, selectedSong, baseUrl } = this.state;
+    console.log(selectedSong);
+    
+    let selectedTrack;
+    let numTries = 0;
+    const retryFetchUntilUpdate = () => {
 
-    let selectedSong;
-    fetch(`https://api.spotify.com/v1/me/player/currently-playing?device_id=${deviceId}`, {
-      method: 'GET',
-      headers: { 'Authorization': 'Bearer ' + token },
-    })
+      fetch(baseUrl, {
+        method: 'GET',
+        headers: { 'Authorization': 'Bearer ' + token },
+      })
       .then(response => response.json())
       .then(data => {
-        // console.log(data)
-        selectedSong = {
-          name: data.item.name,
-          duration: Math.round(data.item.duration_ms / 1000),
-          artists: data.item.artists,
-          album: data.item.album.name,
-          image: data.item.album.images[0],
-          id: data.item.id,
-          uri: data.item.uri,
-          offset: data.offset
+        if (numTries < 3){
+          numTries+= 1;
+          setTimeout(retryFetchUntilUpdate, 50)
+        }else{
+          selectedTrack = {
+            name: data.item.name,
+            duration: Math.round(data.item.duration_ms / 1000),
+            artists: data.item.artists,
+            album: data.item.album.name,
+            image: data.item.album.images[0],
+            id: data.item.id,
+            uri: data.item.uri,
+            offset: data.offset
+          }
+          this.setState({ selectedSong: selectedTrack })
+
+          return;
         }
-        this.setState({ selectedSong })
       })
+    }
+    retryFetchUntilUpdate();
   }
   
   onNextClick = () => {
-    fetch(`https://api.spotify.com/v1/me/player/next?device_id=${this.state.deviceId}`, {
-      method: 'POST',
-      headers: { 'Authorization': 'Bearer ' + this.state.token },
-    })
-      .then(response => response.json())
-      .then(data => {
-        console.log(data);
+    const { baseUrl, deviceId, token } = this.state;
 
-      })
-    // this.player.previousTrack();
-    this.updateCurrentlyPlaying();   
-
+    this.setState({ previousSong: this.state.selectedSong })
+    // console.log(this.state.selected);
     
-    // this.player.nextTrack();
+    console.log(this.state.previousSong);
+
+
+    fetch(`${baseUrl}/next?device_id=${deviceId}`, {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + token },
+    })
+    .then(() => this.updateCurrentlyPlaying());  
   }
   
   onRepeatClick = () => {
-    let { repeatState, deviceId, token } = this.state;
+    let { repeatState, deviceId, token, baseUrl } = this.state;
     repeatState = !repeatState;
     let repeat;
     repeatState ? repeat = "context" : repeat = "off";
 
-    fetch(`https://api.spotify.com/v1/me/player/repeat?device_id=${deviceId}&state=${repeat}`, {
-      method: 'POST',
+    fetch(`${baseUrl}/repeat?device_id=${deviceId}&state=${repeat}`, {
+      method: 'PUT',
       headers: { 'Authorization': 'Bearer ' + token },
     }).then(response => console.log(response))
       .then(data => {
       })
   }
 
+
+
+  volumeChange = (vol) => {
+    let { baseUrl, token, deviceId } = this.state;
+    // console.log(vol);
+    fetch(`${baseUrl}/volume?volume_percent=${vol}&device_id=${deviceId}`, {
+      method: "PUT",
+      headers: { 'Authorization': 'Bearer ' + token }
+    })
+      // .then(response => response.json())
+      .then(data => {
+        console.log(data);
+
+      })
+this.setState({
+  volume: vol
+})
+
+  }
+
   render() {
     const {
+      deviceType,
       playing,
       playlists,
       selectedPlaylist,
       selectedSong,
-      deviceType
+      volume,
+      user
     } = this.state;
     
     // let playlistToRender = 
@@ -383,7 +443,7 @@ class App extends Component {
     //     }) : []
     return (
       <div className="App">
-        {this.state.user && playlists ?
+        {user && playlists ?
           
 
           <React.Fragment>
@@ -407,6 +467,8 @@ class App extends Component {
               onNextClick={this.onNextClick}
               onRepeatClick={this.onRepeatClick}
               selectedSong={selectedSong}
+              volume={volume}
+              volumeChange={this.volumeChange}
             />
           </React.Fragment> :
           <React.Fragment>

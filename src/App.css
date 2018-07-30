@@ -222,3 +222,64 @@ aside{
   width: 120px;
   color: #e9e9e9;
 }
+
+#slider-range{
+  height: 6px;
+  width: 100px;
+}
+.noUi-horizontal .noUi-handle{
+  width: 20px;
+  height: 20px;
+  margin-right: 5px;
+  border-radius: 50%;
+}
+
+.noUi-horizontal .noUi-handle:active{
+  background-color: black;
+}
+
+.noUi-horizontal .noUi-handle:before, .noUi-horizontal .noUi-handle:after{
+  display: none;
+}
+/* .noUi-target{
+  height: 5px;
+}
+.noUi-handle{
+  height: 5px;
+  color: red;
+}
+.noUi-base:before{
+  height: 50px;
+} */
+/* .noUi-handle{
+  height: 5px;
+}
+
+.noUi-handle-lower{
+  height: 5px;
+} */
+
+
+/* .noUiSlider{
+   height: 100px;
+  width: 100px;
+} */
+/* .noUi-base{
+ width: 100px;
+
+  height: 100%;
+}
+
+.noUi-origin{
+ width: 100px;
+  height: 100%;
+}
+.noUi-handle{
+ width: 100px;
+  height: 100%;
+}
+
+.noUi-connects{
+  height: 100%;
+ width: 100px;
+} */

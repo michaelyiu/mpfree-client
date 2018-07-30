@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import SoundSlider from './SoundSlider';
 
 class Player extends Component {
     constructor(props) {
@@ -30,7 +31,9 @@ class Player extends Component {
     }
 
     handleNext(){
+        // this.props.onNextClick(this.props.updateCurrentlyPlaying());
         this.props.onNextClick();
+        // this.props.updateCurrentlyPlaying(this.props.onNextClick());
     }
 
     handlePrev(){
@@ -38,7 +41,7 @@ class Player extends Component {
     }
 
     render() {
-        const { playing, selectedSong } = this.props;
+        const { playing, selectedSong, volume, volumeChange } = this.props;
         const { shuffleActive, repeatActive } = this.state;
         
         
@@ -63,14 +66,18 @@ class Player extends Component {
                     }
                     </div>
                     <div className="media-controls">
-                        <div className={shuffleActive ? "shuffle control-active" : "shuffle"} onClick={() => this.handleShuffle()}><i class="fas fa-random"></i></div>
+                        <div className={shuffleActive ? "shuffle control-active" : "shuffle"} onClick={() => this.handleShuffle()}><i className="fas fa-random"></i></div>
                         <div className="prev" onClick={() => this.handlePrev()}><i className="fas fa-step-backward"></i></div>  
                         <div className="play" onClick={() => this.handlePlay()}>{playing ? <i className="far fa-pause-circle"></i> : <i className="far fa-play-circle"></i>}</div>
                         <div className="next" onClick={() => this.handleNext()}><i className="fas fa-step-forward"></i></div>  
-                        <div className={repeatActive ? "repeat control-active" : "repeat"} onClick={() => this.handleRepeat()}><i class="fas fa-redo"></i></div>
-
+                        <div className={repeatActive ? "repeat control-active" : "repeat"} onClick={() => this.handleRepeat()}><i className="fas fa-redo"></i></div>
+    
                     </div>
                     <div className="player-misc">
+                        <SoundSlider 
+                        volume={volume}
+                        volumeChange={volumeChange}
+                        />
                     </div>
                 </div>
             </React.Fragment>
