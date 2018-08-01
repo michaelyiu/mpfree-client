@@ -33,22 +33,22 @@ class MainContent extends Component {
                             selectedPlaylist={selectedPlaylist}
                             onPlayClick={this.props.onPlayClick}
                         />
-                        <div class="playlist-search-container">
-                            <i class="fas fa-search"></i>
-                            <input class="playlist-search" type="text" placeholder="Filter" />
+                        <div className="playlist-search-container">
+                            <i className="fas fa-search"></i>
+                            <input className="playlist-search" type="text" placeholder="Filter" />
                         </div>
 
-                        <li class="songtrack trackLabels">
+                        <li className="songtrack trackLabels">
                             <div className="playSong"></div>
                             <div className="songName">TITLE</div>
                             <div className="songArtists">ARTIST</div>
                             <div className="songAlbum">ALBUM</div>
-                            <div className="songDuration"><i class="far fa-clock"></i></div>
+                            <div className="songDuration"><i className="far fa-clock"></i></div>
                         </li>
                         {selectedPlaylist.songs.map((song) => {
                         return (
-                            <li className="songtrack">
-                                <div className="playSong" onClick={() => this.handleClick(song.id)}><i class="far fa-play-circle"></i></div>
+                            <li className="songtrack" key={song.id}>
+                                <div className="playSong" onClick={() => this.handleClick(song.id)}><i className="far fa-play-circle"></i></div>
                                 <div className="songName">{song.name}</div>
                                 <div className="songArtists">{song.artists.map((artist, i) => i > 0 ? ", " + artist.name : artist.name)}</div>
                                 <div className="songAlbum">{song.album}</div>

@@ -31,9 +31,7 @@ class Player extends Component {
     }
 
     handleNext(){
-        // this.props.onNextClick(this.props.updateCurrentlyPlaying());
         this.props.onNextClick();
-        // this.props.updateCurrentlyPlaying(this.props.onNextClick());
     }
 
     handlePrev(){
@@ -44,12 +42,10 @@ class Player extends Component {
         const { playing, selectedSong, volume, volumeChange } = this.props;
         const { shuffleActive, repeatActive } = this.state;
         
-        
         return (
             <React.Fragment>
                 <div className="player">
                     <div className="songInfo">
-                    {/* {console.log(selectedSong)} */}
                     
                     {selectedSong ?
                         <React.Fragment>

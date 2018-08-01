@@ -198,8 +198,8 @@ class App extends Component {
         headers: { 'Authorization': 'Bearer ' + ACCESS_TOKEN }
       }).then(response => response.json())
       .then(async data => {
-        const deviceId = data.devices.find((device) => device.type === "Smartphone") 
-          ? data.devices.find((device) => device.type === "Smartphone").id : data.devices[0].id;
+        // const deviceId = data.devices.find((device) => device.type === "Smartphone") 
+          // ? data.devices.find((device) => device.type === "Smartphone").id : data.devices[0].id;
         const deviceType = data.devices.find((device) => device.type === "Smartphone")
           ? data.devices.find((device) => device.type === "Smartphone").type : data.devices[0].type;
         
@@ -239,11 +239,6 @@ class App extends Component {
         method: "PUT",
         headers: { 'Authorization': 'Bearer ' + token }
       })
-      // .then(response => response.json())
-      .then(data => {
-        console.log(data);
-  
-      })
       
       
     }
@@ -282,38 +277,25 @@ class App extends Component {
       method: 'PUT',
       headers: { 'Authorization': 'Bearer ' + this.state.token },
     })
-      .then(response => console.log(response))
-      .then(data => {
-      })
 
-      this.setState({
-        shuffleState
-      })
+    this.setState({
+      shuffleState
+    })
 
   }
 
   onPrevClick = () => {
     const { baseUrl, deviceId, token } = this.state;
-
     this.setState({ previousSong: this.state.selectedSong })
-    console.log(deviceId);
-    
-
     
     fetch(`${baseUrl}/previous?device_id=${deviceId}`, {
       method: 'POST',
       headers: { 'Authorization': 'Bearer ' + token },
       })
-      .then(response => response.json())
-      .then(data => {
-        console.log(data);
-        
-      })
-    // this.player.previousTrack();
-    this.updateCurrentlyPlaying();    
+    .then(() => this.updateCurrentlyPlaying());  
   }
+
   onPlayClick = () => {
-    //might have to redo this one..
     const { baseUrl, token, deviceId } = this.state;
 
     let endpoint;
@@ -326,16 +308,12 @@ class App extends Component {
         method: 'PUT',
         headers: { 'Authorization': 'Bearer ' + token },
       })
-      
-      
-      this.updateCurrentlyPlaying();    
-      
+      .then(() => this.updateCurrentlyPlaying());  
     }
     
   updateCurrentlyPlaying = () => {
     
-    const { token, selectedSong, baseUrl } = this.state;
-    console.log(selectedSong);
+    const { token, baseUrl } = this.state;
     
     let selectedTrack;
     let numTries = 0;
@@ -372,12 +350,7 @@ class App extends Component {
   
   onNextClick = () => {
     const { baseUrl, deviceId, token } = this.state;
-
     this.setState({ previousSong: this.state.selectedSong })
-    // console.log(this.state.selected);
-    
-    console.log(this.state.previousSong);
-
 
     fetch(`${baseUrl}/next?device_id=${deviceId}`, {
       method: 'POST',
@@ -395,28 +368,22 @@ class App extends Component {
     fetch(`${baseUrl}/repeat?device_id=${deviceId}&state=${repeat}`, {
       method: 'PUT',
       headers: { 'Authorization': 'Bearer ' + token },
-    }).then(response => console.log(response))
-      .then(data => {
-      })
+    })
   }
 
 
 
   volumeChange = (vol) => {
     let { baseUrl, token, deviceId } = this.state;
-    // console.log(vol);
+
     fetch(`${baseUrl}/volume?volume_percent=${vol}&device_id=${deviceId}`, {
       method: "PUT",
       headers: { 'Authorization': 'Bearer ' + token }
     })
-      // .then(response => response.json())
-      .then(data => {
-        console.log(data);
 
-      })
-this.setState({
-  volume: vol
-})
+    this.setState({
+      volume: vol
+    })
 
   }
 
@@ -484,38 +451,7 @@ this.setState({
               >SIGN IN WITH SPOTIFY</button>
             </div>
           </React.Fragment>
-
-        //   <div>
-        //     <h1 style={{ ...defaultStyle,
-        //        'fontSize': '54px',
-        //        'margin-top': '5px' }}>
-        //       {this.state.user.name}'s Playlist
-        // </h1>
-        //     <PlaylistCounter playlists={playlistToRender} />
-        //     <HoursCounter playlists={playlistToRender} />
-        //     <Filter onTextChange={text =>
-        //       this.setState({ filterString: text })} />
-        //     {/* {playlistToRender.map(playlist =>
-        //      <Playlist 
-        //         key={playlist.imageUrl}
-        //         playlist={playlist} />
-        //     )} */}
-        //   </div> : <button onClick={() => {
-        //     window.location = window.location.href.includes('localhost') 
-        //       ? 'http://localhost:8888/login'
-        //       : 'https://mpfree-backend.herokuapp.com/login' }
-        //   }
-        //   style={{ padding: '20px', fontSize: '50px', marginTop: '20px' }}>Sign in with Spotify</button>
-        // }
-        // {this.state.deviceType === "Computer" 
-        //   ? <div className="player-controls">
-        //       <div className="prev" onClick={() => this.onPrevClick()}><i className="fas fa-step-backward"></i></div>  
-        //       <div className="play" onClick={() => this.onPlayClick()}>{playing ? <i class="far fa-pause-circle"></i> : <i class="far fa-play-circle"></i>}</div> 
-        //       <div className="next" onClick={() => this.onNextClick()}><i className="fas fa-step-forward"></i></div>  
-        //     </div>
-          // : null }
       }
-
       </div>
     );
   }

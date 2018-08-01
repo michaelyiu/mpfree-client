@@ -6,17 +6,18 @@ class Navigation extends Component{
     //     super(props);
     // }
     render(){
-        // console.log(this.props.playlists);
         const { playlists } = this.props;
+        
         return (
             <div className="navigation">
                 <div className="library">YOUR LIBRARY</div>
                 <div className="playlists">PLAYLISTS</div>
                 {playlists.map(key => (
                     <Playlist 
+                        key={key.id}
                         playlist={key} 
                         displaySongs={this.props.displaySongs}
-                        playlists={this.props.playlists} />
+                        playlists={playlists.id} />
                 ))}
             </div>
         )

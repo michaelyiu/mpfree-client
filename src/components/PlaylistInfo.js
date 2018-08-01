@@ -29,22 +29,14 @@ class PlaylistInfo extends Component {
         let hours = Math.floor(duration / 3600);
         let minutes = Math.floor((duration - hours) % 60)
 
-        // if (seconds.toString().length === 1) {
-        //     seconds = "0" + seconds;
-        // }
-
         return hours +  " hr " + minutes + " min";
     }   
     handleClick = () => {
-        const { selectedPlaylist } = this.props;
-        console.log(selectedPlaylist);
-
         this.props.onPlayClick();
     }
 
     render() {
         const { selectedPlaylist } = this.props;
-        // console.log(this.calcPlaylistTime());
         
         return (
             <React.Fragment>

@@ -186,7 +186,7 @@ aside{
   padding-top: 80px;
   padding-left: 40px;
   margin: 0px 0px 40px 0px;
-  background: linear-gradient(top, #4b4b4b 0%, #2b2b2b 50%, #1a1a1a 100%);
+  background: linear-gradient(to bottom, #4b4b4b 0%, #2b2b2b 50%, #1a1a1a 100%);
 }
 
 .playlist-search-container{
@@ -240,6 +240,16 @@ aside{
 
 .noUi-horizontal .noUi-handle:before, .noUi-horizontal .noUi-handle:after{
   display: none;
+}
+
+.sound-controls{
+  display: flex;
+  /* justify-content: flex-end; */
+  align-items: center;
+}
+.vol-icon{
+  /* margin: 5px; */
+  padding: 0px 10px;
 }
 /* .noUi-target{
   height: 5px;

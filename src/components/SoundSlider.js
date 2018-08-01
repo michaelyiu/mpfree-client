@@ -4,15 +4,13 @@ import '../nouislider.css';
 import wNumb from 'wnumb';
 
 class SoundSlider extends Component {
-    constructor(props){
-        super(props);
-    }
+    // constructor(props){
+    //     super(props);
+    // }
 
     componentDidMount(){
         var noUiSlider = require('nouislider');
         let rangeSlider = document.getElementById('slider-range');
-        console.log(this.props.volume);
-        
 
         noUiSlider.create(rangeSlider, 
             {
@@ -26,7 +24,6 @@ class SoundSlider extends Component {
                 })
             }
         )
-        console.log(rangeSlider.noUiSlider.get());
         
         this.setState({
             volume: rangeSlider.noUiSlider.get()
@@ -36,35 +33,28 @@ class SoundSlider extends Component {
     }
 
     createEventHandlers = () => {
-        var noUiSlider = require('nouislider');
         let rangeSlider = document.getElementById('slider-range');
 
         rangeSlider.noUiSlider.on('change', (values, handle) => {
-            console.log("reached");
-            console.log(values[handle]);
             rangeSlider.noUiSlider.set(values[handle]);
 
-            // rangeSlider.noUiSlider.set(this.props.volume)
-            
-        
-            // this.props.volumeChange(rangeSlider.noUiSlider.get())
-            console.log(rangeSlider.noUiSlider.get());
-            this.props.volumeChange(rangeSlider.noUiSlider.get())
-            
+            this.props.volumeChange(rangeSlider.noUiSlider.get());
         })
-        
-
     }
 
     handleChange(){
         let { volume } = this.state;
-        
         this.props.volumeChange(volume);
     }
 
     render(){
         return(
-            <div id="slider-range" className="noUiSlider"></div>
+            <React.Fragment>
+                <div className="sound-controls">
+                    <i className="vol-icon fas fa-volume-down"></i>
+                    <div id="slider-range" className="noUiSlider" style={{ display: 'inline-block' }}></div>
+                </div>
+            </React.Fragment>
 
         )
     }
