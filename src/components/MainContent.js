@@ -38,7 +38,6 @@ class MainContent extends Component {
     }
 
     tabHandler = (tab) => {
-        console.log(tab);
         
         // if(tab == 'Songs'){
         //     this.props.songsAPICall(tab);
@@ -104,7 +103,13 @@ class MainContent extends Component {
                         : (chosenTab !== "" ? 
                             (
                                 //only way for me to chain this crap.. holy.
-                                (chosenTab === "Songs" ? <Songs dataTab={this.props.dataTab} calcTime={this.calcTime}/> 
+                                (chosenTab === "Songs" ? <Songs 
+                                    dataTab={this.props.dataTab} 
+                                    calcTime={this.calcTime} 
+                                    onPlayClick={this.props.onPlayClick}
+                                    onPlayRecentSongsClick={this.props.onPlayRecentSongsClick}
+                                    
+                                    /> 
                                 : (chosenTab === "Albums" ? <Albums dataTab={this.props.dataTab} /> 
                                 : (chosenTab === "Artists" ? <Artists dataTab={this.props.dataTab} />
                                             : (chosenTab === "Recently Played" ? <RecentlyPlayed dataTab={this.props.dataTab} calcTime={this.calcTime} /> 

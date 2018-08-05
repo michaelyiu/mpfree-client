@@ -68,7 +68,6 @@ class App extends Component {
   }
 
   songsAPICall = async (tab) => {
-    console.log(tab);
     const { token, baseUrl } = this.state;
 
     // fetch(`${baseUrl}/player/recently-played`, {
@@ -97,8 +96,6 @@ let fullUrl;
       fullUrl = baseUrl + '/top/tracks';
     }
     else{
-      console.log('reached');
-      
       return [];
     }
     // fetch(`${baseUrl}/tracks`, {
@@ -412,6 +409,33 @@ let fullUrl;
       this.updateCurrentlyPlaying();    
       
     }
+
+  onPlayRecentSongsClick = (songsToPlay) => {
+    //might have to redo this one..
+    
+    const { baseUrl, token, deviceId } = this.state;
+
+    let endpoint;
+
+    this.state.playing ?
+      endpoint = `${baseUrl}/player/pause?device_id=${deviceId}`
+      : endpoint = `${baseUrl}/player/play?device_id=${deviceId}`;
+
+    fetch(endpoint, {
+      method: 'PUT',
+      headers: { 'Authorization': 'Bearer ' + token },
+      body: JSON.stringify({
+        "uris": songsToPlay
+      })
+    })
+
+
+    this.updateCurrentlyPlaying();
+
+  }
+
+
+
     
   updateCurrentlyPlaying = () => {
     
@@ -427,7 +451,7 @@ let fullUrl;
       })
       .then(response => response.json())
       .then(data => {
-        console.log(data);
+        // console.log(data);
         
         if (numTries < 3){
           numTries+= 1;
@@ -534,6 +558,7 @@ let fullUrl;
               playlists={playlists} 
               selectedPlaylist={selectedPlaylist} 
               onPlayClick={this.onPlayClick}
+              onPlayRecentSongsClick={this.onPlayRecentSongsClick}
               playSongAndDisplay={this.playSongAndDisplay}
               songsAPICall={this.songsAPICall}
             />

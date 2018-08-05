@@ -4,10 +4,19 @@ class Songs extends Component {
     // constructor(props) {
     //     super(props);
     // }
+    handleClick = () => {
+        const allSongs = [];
+        
+        this.props.dataTab.items.map((key) => {
+            // console.log(key.track.uri);
+            allSongs.push(key.track.uri);
+        })
+        
+        this.props.onPlayRecentSongsClick(allSongs);
+    }
 
     render() {
         const { dataTab } = this.props;
-        console.log(dataTab);
         
         return (
             <React.Fragment>
