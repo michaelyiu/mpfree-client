@@ -35,6 +35,9 @@ html, body, .root, .App{
   margin: 40px;
 }
 
+
+
+
 .loginContainer p{
   font-size: 20px;
   margin: 20px 0;
@@ -70,6 +73,12 @@ html, body, .root, .App{
 .filler{
   width: 20%;
 }
+
+h2.main-container-songs, h2.main-container-albums, h2.main-container-artists{
+  font-size: 48px;
+  /* margin-left: 40px; */
+}
+
 .songtrack{
   display: flex;
   align-items: center;
@@ -107,12 +116,18 @@ aside{
   color: #b3b3b3;
 }
 
-
-.playlist{
-  margin: 20px 0;
+.library, .playlists{
+  margin: 10px 0;
+}
+.playlist, .library-item{
+  margin-bottom: 25px;
+}
+.library-item-last{
+  margin-bottom: 45px;
 }
 
-.playlist:hover{
+
+.playlist:hover, .library-item:hover, .library-item-last:hover{
   color: white;
 }
 
@@ -172,8 +187,29 @@ aside{
 .artistInfo div{
   margin: 8px 10px;
 }
+.albums-wrapper, .artists-wrapper{
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+}
 
+.single-album, .single-artist{
+  margin: 0px 20px;
+}
 
+.single-artist{
+  text-align: center;
+}
+
+.single-album-image, .single-artist-image{
+  width: 240px;
+  height: 240px;
+  object-fit: cover;
+}
+
+.single-artist-image{
+  border-radius: 50%;
+}
 
 .playlist-image{
   width: 240px;
@@ -188,6 +224,10 @@ aside{
   margin: 0px 0px 40px 0px;
   background: linear-gradient(to bottom, #4b4b4b 0%, #2b2b2b 50%, #1a1a1a 100%);
 }
+.info-container{
+  margin: 80px 0px 40px 40px;
+}
+
 
 .playlist-search-container{
   margin-bottom: 40px;
@@ -222,6 +262,8 @@ aside{
   width: 120px;
   color: #e9e9e9;
 }
+
+
 
 #slider-range{
   height: 6px;

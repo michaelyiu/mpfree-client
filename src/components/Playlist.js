@@ -16,9 +16,12 @@ class Playlist extends Component {
     }
     render() {
         const { playlist } = this.props;
+        
         return (
             <React.Fragment>
-                <div className="playlist" onClick={() => this.props.displaySongs(this.props.playlist.id)}>{playlist.name}</div>
+                { 
+                    <div className="playlist" onClick={() => this.props.displaySongs(this.props.playlist.id)}>{playlist.name}</div>
+                }
             </React.Fragment>
         )
     }

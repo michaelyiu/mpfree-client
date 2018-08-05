@@ -28,10 +28,13 @@ class App extends Component {
   constructor() {
     super();
     this.state = {
-      baseUrl: 'https://api.spotify.com/v1/me/player',
+      baseUrl: 'https://api.spotify.com/v1/me',
+      chosenTab: '',
+      dataTab: [],
       device_id: '',
       deviceType: null,
       filterString: '',
+      libraryItem: ['Your Daily Mix','Recently Played','Songs','Albums','Artists'],
       playlists: [],
       playing: false,
       selectedPlaylist: null,
@@ -64,13 +67,85 @@ class App extends Component {
     });
   }
 
+  songsAPICall = async (tab) => {
+    console.log(tab);
+    const { token, baseUrl } = this.state;
+
+    // fetch(`${baseUrl}/player/recently-played`, {
+    //   method: 'GET',
+    //   headers: { 'Authorization': 'Bearer ' + token },
+    // })
+    // .then((response) => response.json())
+    // .then((data) => console.log(data));
+let apiData;
+let fullUrl;
+    if (tab === 'Songs') {
+      
+      fullUrl = baseUrl + '/tracks';
+    }
+    else if (tab === 'Albums') {
+      fullUrl = baseUrl + '/albums/';
+    }
+    else if (tab === 'Artists') {
+      fullUrl = baseUrl + '/top/artists';
+    }
+    else if (tab === 'Recently Played') {
+      console.log('reached');
+      fullUrl = baseUrl + '/player/recently-played';
+    }
+    else if (tab === 'Your Daily Mix') {
+      fullUrl = baseUrl + '/top/tracks';
+    }
+    else{
+      console.log('reached');
+      
+      return [];
+    }
+    // fetch(`${baseUrl}/tracks`, {
+    //   method: 'GET',
+    //   headers: { 'Authorization': 'Bearer ' + token },
+    // })
+    //   .then((response) => response.json())
+    //   .then((data) => console.log(data));
+    
+    
+          await fetch(`${fullUrl}`, {
+              method: 'GET',
+              headers: { 'Authorization': 'Bearer ' + token },
+            })
+              .then((response) => response.json())
+              .then((data) => apiData = data);
+    
+    // else if (tab === "Albums") {
+    //   await fetch(`${baseUrl}/albums`, {
+    //     method: 'GET',
+    //     headers: { 'Authorization': 'Bearer ' + token },
+    //   })
+    //     .then((response) => response.json())
+    //     .then((data) => {
+    //       apiData = data.items;
+    //     });
+        
+    // }
+    // else if (tab === "Artists") {
+    //   await fetch(`${baseUrl}/top/artists`, {
+    //       method: 'GET',
+    //       headers: { 'Authorization': 'Bearer ' + token },
+    //     })
+    //       .then((response) => response.json())
+    //       .then((data) => apiData = data.items);
+        
+    // }
+    this.setState({ dataTab: apiData })
+    // return apiData;
+  }
   playSongAndDisplay = (key) => {
     
     const { selectedPlaylist, deviceId, token, baseUrl } = this.state;
     //selectedPlaylist almost always exists, but that doesnt mean it can find the song ID...
     const selectedSong = selectedPlaylist ? selectedPlaylist.songs.find((song) => song.id === key) : key;
 
-      fetch(`${baseUrl}/play?device_id=${deviceId}`, {
+    fetch(`${baseUrl}/player/play?device_id=${deviceId}`, {
         method: 'PUT',
         headers: { 'Authorization': 'Bearer ' + token },
         // 'offset': {'position': 5 },
@@ -87,6 +162,12 @@ class App extends Component {
     const selectedPlaylist = this.state.playlists.find((playlist) => playlist.id === key)
     this.setState({ selectedPlaylist })
   }
+
+  displayContent = (chosenTab) => {
+    console.log(chosenTab);
+    this.setState({ selectedPlaylist: null, chosenTab })
+  }
+
 
   checkForPlayer(){
     const { token } = this.state;
@@ -123,16 +204,19 @@ class App extends Component {
       return;
 
 
-      
+    let username;
     const endpoint = 'https://api.spotify.com/v1/me';
     fetch(endpoint, {
       headers: {'Authorization' : 'Bearer ' + ACCESS_TOKEN}
     }).then(response => response.json())
-    .then(data => this.setState({ 
-      user: {
-        name: data.display_name
-      }
-    }));
+    .then(data => {
+      username = data.display_name
+    })
+    // .then(data => this.setState({ 
+    //   user: {
+    //     name: data.display_name
+    //   }
+    // }));
 
 
     fetch(endpoint + "/playlists", {
@@ -190,7 +274,7 @@ class App extends Component {
 
 
       
-      
+      let deviceType;
       
       
       // const endpoint = 'https://api.spotify.com/v1/me';
@@ -200,13 +284,13 @@ class App extends Component {
       .then(async data => {
         // const deviceId = data.devices.find((device) => device.type === "Smartphone") 
           // ? data.devices.find((device) => device.type === "Smartphone").id : data.devices[0].id;
-        const deviceType = data.devices.find((device) => device.type === "Smartphone")
+        deviceType = data.devices.find((device) => device.type === "Smartphone")
           ? data.devices.find((device) => device.type === "Smartphone").type : data.devices[0].type;
         
 
-          this.setState({
-            deviceType: deviceType
-          })
+          // this.setState({
+          //   deviceType: deviceType
+          // })
           
         }
       );
@@ -214,6 +298,10 @@ class App extends Component {
       
       
       this.setState({
+        deviceType: deviceType,
+              user: {
+        name: username
+      },
         token: ACCESS_TOKEN
       }, )
       
@@ -235,7 +323,7 @@ class App extends Component {
         }),
       });
       
-      await fetch(`${baseUrl}/volume?volume_percent=${volume}&device_id=${deviceId}`, {
+      await fetch(`${baseUrl}/player/volume?volume_percent=${volume}&device_id=${deviceId}`, {
         method: "PUT",
         headers: { 'Authorization': 'Bearer ' + token }
       })
@@ -273,10 +361,11 @@ class App extends Component {
   onShuffleClick = () => {
     let { shuffleState, baseUrl } = this.state;
     shuffleState = !shuffleState;
-    fetch(`${baseUrl}/shuffle?device_id=${this.state.deviceId}&state=${shuffleState}`, {
+    fetch(`${baseUrl}/player/shuffle?device_id=${this.state.deviceId}&state=${shuffleState}`, {
       method: 'PUT',
       headers: { 'Authorization': 'Bearer ' + this.state.token },
     })
+    .then(response => console.log(response))
 
     this.setState({
       shuffleState
@@ -286,29 +375,42 @@ class App extends Component {
 
   onPrevClick = () => {
     const { baseUrl, deviceId, token } = this.state;
+
     this.setState({ previousSong: this.state.selectedSong })
+    console.log(deviceId);
     
-    fetch(`${baseUrl}/previous?device_id=${deviceId}`, {
+
+    
+    fetch(`${baseUrl}/player/previous?device_id=${deviceId}`, {
       method: 'POST',
       headers: { 'Authorization': 'Bearer ' + token },
       })
-    .then(() => this.updateCurrentlyPlaying());  
+      .then(response => response.json())
+      .then(data => {
+        console.log(data);
+        
+      })
+    // this.player.previousTrack();
+    this.updateCurrentlyPlaying();    
   }
-
   onPlayClick = () => {
+    //might have to redo this one..
     const { baseUrl, token, deviceId } = this.state;
 
     let endpoint;
     
     this.state.playing ? 
-      endpoint = `${baseUrl}/pause?device_id=${deviceId}` 
-      : endpoint = `${baseUrl}/play?device_id=${deviceId}`;
+      endpoint = `${baseUrl}/player/pause?device_id=${deviceId}` 
+      : endpoint = `${baseUrl}/player/play?device_id=${deviceId}`;
 
       fetch(endpoint, {
         method: 'PUT',
         headers: { 'Authorization': 'Bearer ' + token },
       })
-      .then(() => this.updateCurrentlyPlaying());  
+      
+      
+      this.updateCurrentlyPlaying();    
+      
     }
     
   updateCurrentlyPlaying = () => {
@@ -319,12 +421,14 @@ class App extends Component {
     let numTries = 0;
     const retryFetchUntilUpdate = () => {
 
-      fetch(baseUrl, {
+      fetch(baseUrl + "/player", {
         method: 'GET',
         headers: { 'Authorization': 'Bearer ' + token },
       })
       .then(response => response.json())
       .then(data => {
+        console.log(data);
+        
         if (numTries < 3){
           numTries+= 1;
           setTimeout(retryFetchUntilUpdate, 50)
@@ -350,9 +454,10 @@ class App extends Component {
   
   onNextClick = () => {
     const { baseUrl, deviceId, token } = this.state;
+
     this.setState({ previousSong: this.state.selectedSong })
 
-    fetch(`${baseUrl}/next?device_id=${deviceId}`, {
+    fetch(`${baseUrl}/player/next?device_id=${deviceId}`, {
       method: 'POST',
       headers: { 'Authorization': 'Bearer ' + token },
     })
@@ -365,18 +470,18 @@ class App extends Component {
     let repeat;
     repeatState ? repeat = "context" : repeat = "off";
 
-    fetch(`${baseUrl}/repeat?device_id=${deviceId}&state=${repeat}`, {
+    fetch(`${baseUrl}/player/repeat?device_id=${deviceId}&state=${repeat}`, {
       method: 'PUT',
       headers: { 'Authorization': 'Bearer ' + token },
-    })
+    }).then(response => console.log(response))
   }
 
 
 
   volumeChange = (vol) => {
     let { baseUrl, token, deviceId } = this.state;
-
-    fetch(`${baseUrl}/volume?volume_percent=${vol}&device_id=${deviceId}`, {
+    // console.log(vol);
+    fetch(`${baseUrl}/player/volume?volume_percent=${vol}&device_id=${deviceId}`, {
       method: "PUT",
       headers: { 'Authorization': 'Bearer ' + token }
     })
@@ -389,7 +494,10 @@ class App extends Component {
 
   render() {
     const {
+      chosenTab,
+      dataTab,
       deviceType,
+      libraryItem,
       playing,
       playlists,
       selectedPlaylist,
@@ -416,13 +524,18 @@ class App extends Component {
           <React.Fragment>
             <Navigation 
               playlists={playlists}
+              displayContent={this.displayContent}
               displaySongs={this.displaySongs}  
+              libraryItem={libraryItem}
             />
             <MainContent 
+              chosenTab={chosenTab}
+              dataTab={dataTab}
               playlists={playlists} 
               selectedPlaylist={selectedPlaylist} 
               onPlayClick={this.onPlayClick}
               playSongAndDisplay={this.playSongAndDisplay}
+              songsAPICall={this.songsAPICall}
             />
             <div className="filler"></div>
             <Player 

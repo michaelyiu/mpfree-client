@@ -47,6 +47,7 @@ class Player extends Component {
                 <div className="player">
                     <div className="songInfo">
                     
+                    
                     {selectedSong ?
                         <React.Fragment>
                             <img src={selectedSong.image ? selectedSong.image.url : selectedSong.album.images[0].url} alt=""/>
