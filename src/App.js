@@ -434,7 +434,7 @@ let fullUrl;
 
 
     
-  updateCurrentlyPlaying = () => {
+  updateCurrentlyPlaying = async () => {
     
     const { token, baseUrl } = this.state;
     
@@ -469,7 +469,7 @@ let fullUrl;
         }
       })
     }
-    retryFetchUntilUpdate();
+    await retryFetchUntilUpdate();
   }
   
   onNextClick = () => {
