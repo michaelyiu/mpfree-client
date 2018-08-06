@@ -336,7 +336,7 @@ let fullUrl;
         position,
         duration,
       } = state.track_window;
-      // console.log(currentTrack);
+      console.log(currentTrack);
       
       const trackName = currentTrack.name;
       const albumName = currentTrack.album.name;
@@ -344,6 +344,7 @@ let fullUrl;
         .map(artist => artist.name)
         .join(", ");
       const playing = !state.paused;
+      this.updateCurrentlyPlaying();
       this.setState({
         position,
         duration,
@@ -391,10 +392,9 @@ let fullUrl;
     this.updateCurrentlyPlaying();    
   }
   onPlayClick = () => {
-    //might have to redo this one..
     const { baseUrl, token, deviceId } = this.state;
-
     let endpoint;
+    console.log("normal");
     
     this.state.playing ? 
       endpoint = `${baseUrl}/player/pause?device_id=${deviceId}` 
@@ -412,14 +412,16 @@ let fullUrl;
 
   onPlayRecentSongsClick = (songsToPlay) => {
     //might have to redo this one..
+    console.log("odd");
     
     const { baseUrl, token, deviceId } = this.state;
 
     let endpoint;
 
-    this.state.playing ?
-      endpoint = `${baseUrl}/player/pause?device_id=${deviceId}`
-      : endpoint = `${baseUrl}/player/play?device_id=${deviceId}`;
+    // this.state.playing ?
+      // endpoint = `${baseUrl}/player/pause?device_id=${deviceId}`
+      // : endpoint = `${baseUrl}/player/play?device_id=${deviceId}`;
+       endpoint = `${baseUrl}/player/play?device_id=${deviceId}`;
 
     fetch(endpoint, {
       method: 'PUT',
@@ -440,6 +442,7 @@ let fullUrl;
   updateCurrentlyPlaying = () => {
     
     const { token, baseUrl } = this.state;
+    // console.log(selectedTrack);
     
     let selectedTrack;
     let numTries = 0;

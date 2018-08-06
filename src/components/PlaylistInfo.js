@@ -32,7 +32,17 @@ class PlaylistInfo extends Component {
         return hours +  " hr " + minutes + " min";
     }   
     handleClick = () => {
-        this.props.onPlayClick();
+        const allSongs = [];
+        
+        this.props.selectedPlaylist.songs.map((key) => {
+            // console.log(key.track.uri);
+            // allSongs.push(key.track.uri);
+            allSongs.push(key.uri);
+        })
+        console.log(allSongs);
+        
+        this.props.onPlayRecentSongsClick(allSongs);
+        // this.props.onPlayClick();
     }
 
     render() {

@@ -73,7 +73,7 @@ class MainContent extends Component {
                     <React.Fragment>
                         <PlaylistInfo 
                             selectedPlaylist={selectedPlaylist}
-                            onPlayClick={this.props.onPlayClick}
+                            onPlayRecentSongsClick={this.props.onPlayRecentSongsClick}
                         />
                         <div className="playlist-search-container">
                             <i className="fas fa-search"></i>
