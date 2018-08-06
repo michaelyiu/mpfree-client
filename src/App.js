@@ -444,7 +444,9 @@ let fullUrl;
 
       fetch(baseUrl + "/player", {
         method: 'GET',
-        headers: { 'Authorization': 'Bearer ' + token },
+        headers: { 'Authorization': 'Bearer ' + token,
+                  'Access-Control-Allow-Origin': '*'
+                  },
       })
       .then(response => response.json())
       .then(data => {
