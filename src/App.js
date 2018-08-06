@@ -89,7 +89,6 @@ let fullUrl;
       fullUrl = baseUrl + '/top/artists';
     }
     else if (tab === 'Recently Played') {
-      console.log('reached');
       fullUrl = baseUrl + '/player/recently-played';
     }
     else if (tab === 'Your Daily Mix') {
@@ -161,7 +160,6 @@ let fullUrl;
   }
 
   displayContent = (chosenTab) => {
-    console.log(chosenTab);
     this.setState({ selectedPlaylist: null, chosenTab })
   }
 
@@ -388,13 +386,11 @@ let fullUrl;
         console.log(data);
         
       })
-    // this.player.previousTrack();
     this.updateCurrentlyPlaying();    
   }
   onPlayClick = () => {
     const { baseUrl, token, deviceId } = this.state;
     let endpoint;
-    console.log("normal");
     
     this.state.playing ? 
       endpoint = `${baseUrl}/player/pause?device_id=${deviceId}` 
@@ -412,7 +408,6 @@ let fullUrl;
 
   onPlayRecentSongsClick = (songsToPlay) => {
     //might have to redo this one..
-    console.log("odd");
     
     const { baseUrl, token, deviceId } = this.state;
 
@@ -442,7 +437,6 @@ let fullUrl;
   updateCurrentlyPlaying = () => {
     
     const { token, baseUrl } = this.state;
-    // console.log(selectedTrack);
     
     let selectedTrack;
     let numTries = 0;
@@ -454,7 +448,6 @@ let fullUrl;
       })
       .then(response => response.json())
       .then(data => {
-        // console.log(data);
         
         if (numTries < 3){
           numTries+= 1;

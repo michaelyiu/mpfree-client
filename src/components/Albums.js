@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import uuidv1 from 'uuid/v1';
 
 class Albums extends Component {
     // constructor(props) {
@@ -7,11 +8,9 @@ class Albums extends Component {
 
     render() {
         const { dataTab } = this.props;
-        console.log(dataTab);
 
         return (
             <React.Fragment>
-                {/* <div className="songArtists">{song.artists.map((artist, i) => i > 0 ? ", " + artist.name : artist.name)}</div> */}
                 <div className="info-container">                
 
                     <h2 className="main-container-albums">Albums</h2>
@@ -23,9 +22,10 @@ class Albums extends Component {
                 <div className="albums-wrapper">
 
                 {dataTab.items ? dataTab.items.map((key) => {
+                    
                     return (
                         key.album ?
-                        <div className="single-album"> 
+                        <div className="single-album" key={ key.id + uuidv1() }> 
                             <img className="single-album-image" src={key.album.images[0].url} alt="" />
                             <div>{key.album ? key.album.name : null}</div>
                         <div>{key.album ? key.album.artists.map((artist, i) => i > 0 ? ", " + artist.name : artist.name) : null}</div>

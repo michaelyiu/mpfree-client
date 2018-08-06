@@ -7,7 +7,6 @@ class DailyMix extends Component {
 
     render() {
         const { dataTab } = this.props;
-        console.log(dataTab);
 
         return (
             <React.Fragment>

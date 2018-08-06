@@ -13,28 +13,22 @@ class Navigation extends Component{
             <div className="navigation">
                 <div className="library">YOUR LIBRARY</div>
                 {libraryItem.map((key, index) => {
-                    // console.log(key);
-                    
-                    
 
                     return libraryItem.length === index + 1 
                     ? <LibraryItem
+                        key={key}
                         item={key}
                         classToAdd={"library-item-last"}
                         displayContent={this.props.displayContent}
 
                     /> 
                     : <LibraryItem
+                        key={key}
                         item={key}
                         classToAdd={"library-item"}
                         displayContent={this.props.displayContent}
                     />
 
-                    // if(libraryItem.length === index + 1){
-                    //     return (<div className="library-item-last">{key}</div>)    
-                    // }
-                    // else
-                    //     return (<div className="library-item">{key}</div>)
                 })}
                 <div className="playlists">PLAYLISTS</div>
                 {playlists.map(key => (

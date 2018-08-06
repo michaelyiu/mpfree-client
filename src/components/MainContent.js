@@ -63,7 +63,7 @@ class MainContent extends Component {
     }
 
     render(){
-        const { selectedPlaylist, chosenTab } = this.props;
+        const { selectedPlaylist, chosenTab, dataTab } = this.props;
         
         return (
             <React.Fragment>
@@ -102,6 +102,7 @@ class MainContent extends Component {
                     </React.Fragment>
                         : (chosenTab !== "" ? 
                             (
+                                
                                 //only way for me to chain this crap.. holy.
                                 (chosenTab === "Songs" ? <Songs 
                                     dataTab={this.props.dataTab} 

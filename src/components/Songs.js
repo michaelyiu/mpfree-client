@@ -1,17 +1,11 @@
 import React, { Component } from 'react';
+import uuidv1 from 'uuid/v1';
 
 class Songs extends Component {
-    // constructor(props) {
-    //     super(props);
-    // }
     handleClick = () => {
-        const allSongs = [];
-        
-        this.props.dataTab.items.map((key) => {
-            // console.log(key.track.uri);
-            allSongs.push(key.track.uri);
+        const allSongs = this.props.dataTab.items.map((key) => {
+            return key.track.uri;
         })
-        
         this.props.onPlayRecentSongsClick(allSongs);
     }
 
@@ -39,9 +33,10 @@ class Songs extends Component {
 
                 
                 {dataTab.items ? dataTab.items.map((key) => {
+                    
                     return (
                         key.track ? 
-                            <li className="songtrack" key={key.id}>
+                            <li className="songtrack" key={key.id + uuidv1()}>
                                 <div className="songName">{key.track.name}</div>
                                 <div className="songArtists">{key.track.artists.map((artist, i) => i > 0 ? ", " + artist.name : artist.name)}</div>
                                 <div className="songAlbum">{key.track.album.name}</div>
