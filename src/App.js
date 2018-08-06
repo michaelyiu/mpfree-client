@@ -444,11 +444,13 @@ let fullUrl;
 
       fetch(baseUrl + "/player", {
         method: 'GET',
-        headers: { 'Authorization': 'Bearer ' + token,
-                  'Access-Control-Allow-Origin': '*'
-                  },
+        headers: { 'Authorization': 'Bearer ' + token },
       })
-      .then(response => response.json())
+      .then(response => {
+        return response.status === 204 ? [] : response.json();
+
+      })
+      // response.json())
       .then(data => {
         
         if (numTries < 3){
